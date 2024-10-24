@@ -20,7 +20,7 @@ namespace CST_350_Minesweeper_Website.Controllers
         {
             // Check for a match
             UserModel result = users.CheckCredentials(loginViewModel.Username, loginViewModel.Password);
-            // 
+            // If the Id is 0, it failed. If not, it succeeded, so return the success view
             if (result.Id != 0)
             {
                 UserModel user = users.GetUserById(result.Id);

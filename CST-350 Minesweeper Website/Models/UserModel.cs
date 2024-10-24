@@ -13,11 +13,7 @@
         public string Email { get; set; }
 
         /// <summary>
-        /// Sets the password
-        /// </summary>
-        /// <param name="password"></param>
-        /// <summary>
-        /// Sets the password and generates a salt
+        /// Sets the user's password
         /// </summary>
         /// <param name="password"></param>
         public void SetPassword(string password)

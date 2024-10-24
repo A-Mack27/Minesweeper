@@ -10,6 +10,12 @@ namespace CST_350_Minesweeper_Website.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Processes the inputted login information and sends the user to the corresponding page
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public IActionResult ProcessLogin(string username, string password)
         {
             int result = -1;

@@ -13,7 +13,7 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
         static string username = "root";
         static string password = "root";
         static string dbName = "userauth";
-        static string port = "8889";
+        static string port = "8889"; // Change this depending on your MySQL port number
 
         /// <summary>
         /// Add new user
@@ -50,21 +50,25 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                     return result;
                 }
 
-                // Your homework to complete this so the user knows to re-enter the information
                 throw new InvalidOperationException("Failed to retrieve the inserted ID.");
             }
         }
 
+        /// <summary>
+        /// Checks the entered credentials of a user and vaidates them
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns>The user found, or a blank user if none was found</returns>
         public UserModel CheckCredentials(string username, string password)
         {
-            string query = "";
-
+            // Connect to the database
             using (SqlConnection connection = new SqlConnection(conn))
             {
                 // Open the connection to the database
                 connection.Open();
                 // Define the SQL query to select user details from the UserAccount table where the username and password match
-                query = "SELECT * FROM UserAccount WHERE Username = @Username AND MyPassword = @password";
+                string query = "SELECT * FROM UserAccount WHERE Username = @Username AND MyPassword = @password";
                 // Create a SQL command object using the query and the open connection
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -74,18 +78,14 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                     command.Parameters.AddWithValue(@"password", password);
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
+                        // Return the user if the username and password are correct
                         foreach (UserModel user in UserCollection._users)
-                        {
-                            // Get the id
                             if (user.Username == username && UserCollection.VerifyPassword(password, user))
-                            {
                                 return user;
-                            }
-                        }
                     }
                 }
             }
-            // Return a new user
+            // Return a new blank user if it's not correct
             return new UserModel
             {
                 Id = 0,
@@ -98,7 +98,11 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                 Email = "",
             };
         }
-
+        
+        /// <summary>
+        /// Removes a user from the database
+        /// </summary>
+        /// <param name="user"></param>
         public void DeleteUser(UserModel user)
         {
             using (SqlConnection connection = new SqlConnection(conn))
@@ -120,6 +124,10 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
             }
         }
 
+        /// <summary>
+        /// Returns all the users from the database
+        /// </summary>
+        /// <returns></returns>
         public List<UserModel> GetAllUsers()
         {
             List<UserModel> users = new List<UserModel>();
@@ -150,22 +158,32 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                                 Sex = reader.GetString(reader.GetOrdinal("Sex")),
                                 Email = reader.GetString(reader.GetOrdinal("Email")),
                             };
-
+                            // Add it to the list
                             users.Add(user);
                         }
                     }
                 }
             }
-
+            // Return the list
             return users;
         }
 
-
+        /// <summary>
+        /// Searches for a user based on the inputted ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>The user found</returns>
+        /// <exception cref="NotImplementedException"></exception>
         public UserModel GetUserById(int id)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Updates the information of a desired user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <exception cref="NotImplementedException"></exception>
         public void UpdateUser(UserModel user)
         {
             throw new NotImplementedException();
