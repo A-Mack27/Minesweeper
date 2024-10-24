@@ -28,8 +28,8 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                 // Open the connection to the database
                 connection.Open();
                 // Define the SQL query with parameter placeholders to prevent SQL Injection attack
-                string query = "INSERT INTO UserAccount (Username, Password, Group)" +
-                    "VALUES (@Username, @Password, @Group); " +
+                string query = "INSERT INTO UserAccount (Username, Password, FirstName, LastName, Sex, Age, Email)" +
+                    "VALUES (@Username, @Password, @FirstName, @LastName, @Sex, @Age, @Email); " +
                     "SELECT SCOPE_IDENTITY();";
 
                 // Create a SQL command object using the query and open connection
@@ -38,7 +38,11 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                     // Add parameters to the command to safely pass user input values, avoiding SQL injection
                     command.Parameters.AddWithValue("@Username", user.Username);
                     command.Parameters.AddWithValue("@Password", user.PasswordHash);
-                    command.Parameters.AddWithValue("@Group", user.Groups);
+                    command.Parameters.AddWithValue("@FirstName", user.FirstName);
+                    command.Parameters.AddWithValue("@LastName", user.LastName);
+                    command.Parameters.AddWithValue("@Sex", user.Sex);
+                    command.Parameters.AddWithValue("@Age", user.Age);
+                    command.Parameters.AddWithValue("@Email", user.Email);
 
                     // Execute the query and retrieve the new inserted ID using ExecuteScalar
                     int result = Convert.ToInt32(command.ExecuteScalar());
@@ -51,7 +55,7 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
             }
         }
 
-        public int CheckCredentials(string username, string password)
+        public UserModel CheckCredentials(string username, string password)
         {
             string query = "";
 
@@ -70,27 +74,30 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                     command.Parameters.AddWithValue(@"password", password);
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
-
+                        foreach (UserModel user in UserCollection._users)
+                        {
+                            // Get the id
+                            if (user.Username == username && UserCollection.VerifyPassword(password, user))
+                            {
+                                return user;
+                            }
+                        }
                     }
                 }
             }
-
-            // Given a username and password, find a matching user
-            // Return the user's Id
-            // Iterate over the UserModel
-            // Instantiate the UserDAO
-            UserDAO dataAccess = new UserDAO();
-            foreach (UserModel user in UserCollection._users)
+            // Return a new user
+            return new UserModel
             {
-                // Get the id
-                if (user.Username == username && UserCollection.VerifyPassword(password, user))
-                {
-                    return (dataAccess.CheckCredentials(username, password));
-                }
-            }
-            // No matches found. Invalid Login
-            return -1;
-        } // End CheckCredentials
+                Id = 0,
+                Username = "",
+                PasswordHash = "",
+                FirstName = "",
+                LastName = "",
+                Age = 0,
+                Sex = "",
+                Email = "",
+            };
+        }
 
         public void DeleteUser(UserModel user)
         {
@@ -137,7 +144,11 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Username = reader.GetString(reader.GetOrdinal("Username")),
                                 PasswordHash = reader.GetString(reader.GetOrdinal("MyPassword")),
-                                Groups = reader.GetString(reader.GetOrdinal("GroupName"))
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                Age = reader.GetInt32(reader.GetOrdinal("Age")),
+                                Sex = reader.GetString(reader.GetOrdinal("Sex")),
+                                Email = reader.GetString(reader.GetOrdinal("Email")),
                             };
 
                             users.Add(user);

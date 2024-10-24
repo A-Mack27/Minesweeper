@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CST_350_Register_and_Login_App.Models
+namespace CST_350_Minesweeper_Website.Models
 {
     public class LoginViewModel
     {

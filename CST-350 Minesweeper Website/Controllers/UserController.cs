@@ -1,5 +1,4 @@
 ﻿using CST_350_Minesweeper_Website.Models;
-using CST_350_Register_and_Login_App.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CST_350_Minesweeper_Website.Controllers
@@ -19,13 +18,12 @@ namespace CST_350_Minesweeper_Website.Controllers
         /// <returns></returns>
         public IActionResult ProcessLogin(LoginViewModel loginViewModel)
         {
-            int result = -1;
             // Check for a match
-            result = users.CheckCredentials(loginViewModel.Username, loginViewModel.Password);
+            UserModel result = users.CheckCredentials(loginViewModel.Username, loginViewModel.Password);
             // 
-            if (result == 0)
+            if (result.Id != 0)
             {
-                UserModel user = users.GetUserById(result);
+                UserModel user = users.GetUserById(result.Id);
                 return View("LoginSuccess", user);
             }
             return View("LoginFailure");

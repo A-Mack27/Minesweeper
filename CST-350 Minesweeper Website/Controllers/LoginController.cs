@@ -19,7 +19,7 @@ namespace CST_350_Minesweeper_Website.Controllers
 
             UserModel userData = new() { Id = 1, Username = username, PasswordHash = password };
 
-            if (users.CheckCredentials(username, password) > 0)
+            if (users.CheckCredentials(username, password).Id != 0)
             {
                 userJson = ServiceStack.Text.JsonSerializer.SerializeToString(userData);
 
@@ -27,7 +27,7 @@ namespace CST_350_Minesweeper_Website.Controllers
 
                 return View("LoginSuccess", userData);
             }
-            return View("LoginFailure", userData);
+            return View("LoginFailure", new LoginViewModel());
         }
     }
 }

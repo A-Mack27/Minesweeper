@@ -6,8 +6,11 @@
         public int Id { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
-        public byte[] Salt { get; set; }
-        public string Groups { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Sex { get; set; }
+        public int Age { get; set; }
+        public string Email { get; set; }
 
         /// <summary>
         /// Sets the password

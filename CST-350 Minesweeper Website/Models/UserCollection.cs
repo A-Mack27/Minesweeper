@@ -1,18 +1,32 @@
 ﻿
+using CST_350_Minesweeper_Website.Services.DataAccess;
+
 namespace CST_350_Minesweeper_Website.Models
 {
     public class UserCollection : IUserManager
     {
         public static List<UserModel> _users;
 
+        public UserCollection()
+        {
+            _users = new List<UserModel>();
+        }
+
         public int AddUser(UserModel user)
         {
             throw new NotImplementedException();
         }
 
-        public int CheckCredentials(string username, string password)
+        public UserModel CheckCredentials(string username, string password)
         {
-            throw new NotImplementedException();
+            UserModel user = new UserModel();
+
+            UserDAO dataAccess = new UserDAO();
+            // Takes data down to the data access layer
+            user = dataAccess.CheckCredentials(username, password);
+
+            // Sends data up to the presentation
+            return user;
         }
 
         public void DeleteUser(UserModel user)

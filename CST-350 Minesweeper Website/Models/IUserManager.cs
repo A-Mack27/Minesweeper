@@ -7,6 +7,6 @@
         public int AddUser(UserModel user);
         public void DeleteUser(UserModel user);
         public void UpdateUser(UserModel user);
-        public int CheckCredentials(string username, string password);
+        public UserModel CheckCredentials(string username, string password);
     }
 }
