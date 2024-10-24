@@ -13,7 +13,9 @@ namespace CST_350_Minesweeper_Website.Models
         /// </summary>
         public UserCollection()
         {
+            UserDAO dataAccess = new UserDAO();
             _users = new List<UserModel>();
+            _users = dataAccess.GetAllUsers();
         }
 
         /// <summary>

@@ -10,23 +10,5 @@ namespace CST_350_Minesweeper_Website.Controllers
         {
             return View();
         }
-
-        /// <summary>
-        /// Controller to be called to process the user login
-        /// </summary>
-        /// <param name="loginViewModel"></param>
-        /// <returns></returns>
-        public IActionResult ProcessLogin(LoginViewModel loginViewModel)
-        {
-            // Check for a match
-            UserModel result = users.CheckCredentials(loginViewModel.Username, loginViewModel.Password);
-            // If the Id is 0, it failed. If not, it succeeded, so return the success view
-            if (result.Id != 0)
-            {
-                UserModel user = users.GetUserById(result.Id);
-                return View("LoginSuccess", user);
-            }
-            return View("LoginFailure");
-        }
     }
 }

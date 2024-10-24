@@ -6,13 +6,13 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
     public class UserDAO : IUserManager
     {
         // Define the connection string for MSSQL
-        static string conn = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=UserAuth;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        static string conn = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=UserProfile;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
         // Define the connection string
         static string serverName = "localhost";
         static string username = "root";
         static string password = "root";
-        static string dbName = "userauth";
+        static string dbName = "userprofile";
         static string port = "8889"; // Change this depending on your MySQL port number
 
         /// <summary>
@@ -28,8 +28,8 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                 // Open the connection to the database
                 connection.Open();
                 // Define the SQL query with parameter placeholders to prevent SQL Injection attack
-                string query = "INSERT INTO UserAccount (Username, Password, FirstName, LastName, Sex, Age, Email)" +
-                    "VALUES (@Username, @Password, @FirstName, @LastName, @Sex, @Age, @Email); " +
+                string query = "INSERT INTO UserProfile (Username, PasswordHash, FirstName, LastName, Sex, Age, Email)" +
+                    "VALUES (@Username, @PasswordHash, @FirstName, @LastName, @Sex, @Age, @Email); " +
                     "SELECT SCOPE_IDENTITY();";
 
                 // Create a SQL command object using the query and open connection
@@ -37,7 +37,7 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                 {
                     // Add parameters to the command to safely pass user input values, avoiding SQL injection
                     command.Parameters.AddWithValue("@Username", user.Username);
-                    command.Parameters.AddWithValue("@Password", user.PasswordHash);
+                    command.Parameters.AddWithValue("@PasswordHash", user.PasswordHash);
                     command.Parameters.AddWithValue("@FirstName", user.FirstName);
                     command.Parameters.AddWithValue("@LastName", user.LastName);
                     command.Parameters.AddWithValue("@Sex", user.Sex);
@@ -67,8 +67,8 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
             {
                 // Open the connection to the database
                 connection.Open();
-                // Define the SQL query to select user details from the UserAccount table where the username and password match
-                string query = "SELECT * FROM UserAccount WHERE Username = @Username AND MyPassword = @password";
+                // Define the SQL query to select user details from the UserProfile table where the username and password match
+                string query = "SELECT * FROM UserProfile WHERE Username = @Username AND PasswordHash = @Password";
                 // Create a SQL command object using the query and the open connection
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -111,7 +111,7 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                 connection.Open();
 
                 // Define the SQL query to delete the user based on their ID
-                string query = "DELETE FROM UserAccount WHERE Id = @Id;";
+                string query = "DELETE FROM UserProfile WHERE Id = @Id;";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -138,7 +138,7 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                 connection.Open();
 
                 // Define the SQL query to select all users from the UserAccount table
-                string query = "SELECT * FROM UserAccount;";
+                string query = "SELECT * FROM UserProfile;";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -151,7 +151,7 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Username = reader.GetString(reader.GetOrdinal("Username")),
-                                PasswordHash = reader.GetString(reader.GetOrdinal("MyPassword")),
+                                PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash")),
                                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                                 LastName = reader.GetString(reader.GetOrdinal("LastName")),
                                 Age = reader.GetInt32(reader.GetOrdinal("Age")),
