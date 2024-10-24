@@ -1,4 +1,5 @@
-﻿using CST_350_Minesweeper_Website.Models;
+﻿using CST_350_Minesweeper_Website.Filters;
+using CST_350_Minesweeper_Website.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CST_350_Minesweeper_Website.Controllers
@@ -8,6 +9,16 @@ namespace CST_350_Minesweeper_Website.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        /// <summary>
+        /// Logs the user out of the website
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Remove("User");
+            return View("Index");
         }
 
         /// <summary>
