@@ -51,5 +51,14 @@ namespace CST_350_Minesweeper_Website.Controllers
                 return View("RegisterFailure");
             }
         }
+
+        /// <summary>
+        /// Registration failure view
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult RegisterFailure()
+        {
+            return View();
+        }
     }
 }
