@@ -1,0 +1,11 @@
+﻿@model CST_350_Minesweeper_Website.Models.LoginViewModel
+
+<div>
+    <h2>Login Failure</h2>
+    <p>One or more entries were invalid. Please try again.</p>
+    <hr />
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>

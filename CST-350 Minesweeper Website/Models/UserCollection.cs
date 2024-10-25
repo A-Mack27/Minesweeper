@@ -6,7 +6,7 @@ namespace CST_350_Minesweeper_Website.Models
     public class UserCollection : IUserManager
     {
         // A list to hold all users
-        public static List<UserModel> _users;
+        public static List<UserModel> _users = new List<UserModel>();
 
         /// <summary>
         /// Default constructor
@@ -14,7 +14,6 @@ namespace CST_350_Minesweeper_Website.Models
         public UserCollection()
         {
             UserDAO dataAccess = new UserDAO();
-            _users = new List<UserModel>();
             _users = dataAccess.GetAllUsers();
         }
 

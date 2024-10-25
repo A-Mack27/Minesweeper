@@ -1,5 +1,6 @@
 ﻿using CST_350_Minesweeper_Website.Filters;
 using CST_350_Minesweeper_Website.Models;
+using CST_350_Minesweeper_Website.Services.DataAccess;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CST_350_Minesweeper_Website.Controllers
@@ -29,22 +30,20 @@ namespace CST_350_Minesweeper_Website.Controllers
         /// <returns></returns>
         public IActionResult ProcessLogin(string username, string password)
         {
-            int result = -1;
             string userJson = "";
-
+            // Here's a new instance of UserCollection to manage the users
             UserCollection users = new UserCollection();
-
-            UserModel userData = new() { Id = 1, Username = username, PasswordHash = password };
-
-            if (users.CheckCredentials(username, password).Id != 0)
+            //  Create a new user to represent the data entered during the login attempt
+            UserModel userData = users.CheckCredentials(username, password);
+            // If the ID isn't 0, the login was successful
+            if (userData.Id != 0)
             {
+                // Serialize and store the user data with the key 'user' to be referenced later
                 userJson = ServiceStack.Text.JsonSerializer.SerializeToString(userData);
-
                 HttpContext.Session.SetString("User", userJson);
-
-                return View("LoginSuccess", userData);
+                return View("LoginSuccess", userData); // Return the success view
             }
-            return View("LoginFailure", new LoginViewModel());
+            return View("LoginFailure", new LoginViewModel()); // Return the failure view
         }
     }
 }
