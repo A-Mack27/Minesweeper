@@ -1,4 +1,6 @@
-﻿namespace CST_350_Minesweeper_Website.Models
+﻿using CST_350_Minesweeper_Website.Models;
+
+namespace CST_350_Minesweeper_Website.Interfaces
 {
     /// <summary>
     /// IUserManager interface to serve as the template for the classes it's referenced in

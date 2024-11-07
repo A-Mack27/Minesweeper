@@ -1,4 +1,5 @@
-﻿using CST_350_Minesweeper_Website.Models;
+﻿using CST_350_Minesweeper_Website.Interfaces;
+using CST_350_Minesweeper_Website.Models;
 using System.Data.SqlClient;
 
 namespace CST_350_Minesweeper_Website.Services.DataAccess
