@@ -1,21 +1,71 @@
-﻿using CST_350_Minesweeper_Website.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
-namespace CST_350_Minesweeper_Website.Controllers
+public class GameController : Controller
 {
-	public class GameController : Controller
-	{
-		// Create the board (fixed size and difficulty for now)
-		static BoardModel board = new BoardModel(10,25);
+    // This action handles the form submission from StartGame.cshtml.
+    // It stores the board size and difficulty level in session variables.
+    [HttpPost]
+    public IActionResult Start(string boardSize, string difficulty)
+    {
+        // Store settings in session for later use
+        HttpContext.Session.SetString("BoardSize", boardSize);
+        HttpContext.Session.SetString("Difficulty", difficulty);
 
-		public IActionResult Index()
-		{
-			return View("Index", board);
-		}
+        // Redirect to the GameBoard page where the game will be displayed
+        return RedirectToAction("GameBoard");
+    }
 
-		public IActionResult HandleButtonClick(string row, string colum)
-		{
-			return View();
-		}
-	}
+    // This action is used to display the Minesweeper game board.
+    // It checks if the user has selected a board size, otherwise redirects to StartGame.
+    public IActionResult GameBoard()
+    {
+        // Check if the board size is set in the session to validate access
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("BoardSize")))
+        {
+            // If no game has been started, redirect to StartGame page
+            return RedirectToAction("StartGame", "Home");
+        }
+
+        // If game is started, load the GameBoard view
+        return View();
+    }
+
+    // This action displays the Win page and calculates the final score.
+    public IActionResult Win()
+    {
+        // Calculate score based on game parameters
+        int score = CalculateScore();
+        ViewBag.Score = score; // Pass score to the view using ViewBag
+
+        // Show Win page with the score
+        return View();
+    }
+
+    // This action displays the Loss page when the player loses the game.
+    public IActionResult Loss()
+    {
+        // Load the Loss view
+        return View();
+    }
+
+    // This helper method calculates the score for the game.
+    // Replace with actual score calculation logic based on game requirements.
+    private int CalculateScore()
+    {
+        // Example score calculation (replace with real logic)
+        return 100;
+    }
+
+    // This action handles revealing a cell on the game board.
+    // It returns JSON data to update the game board dynamically.
+    public JsonResult RevealCell(int row, int col)
+    {
+        // Retrieve game state and reveal cell content based on Minesweeper logic
+        var content = "1";
+        
+
+        // Return content as JSON data for client-side processing
+        return Json(new { content });
+    }
 }

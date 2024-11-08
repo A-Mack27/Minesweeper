@@ -1,5 +1,33 @@
 ﻿@{
-    ViewData["Title"] = "StartGame";
+    ViewData["Title"] = "Start Game";
 }
-<h1> StartGame </h1>
-<p> Welcome to the Start Game page. Placeholder text here!!</p>
+
+<h1>Configure Your Game</h1>
+
+<!-- Form to select board size and difficulty level -->
+<form method="post" action="/Game/Start">
+    <div>
+        <label for="boardSize">Select Board Size:</label>
+        <select id="boardSize" name="boardSize" required>
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="difficulty">Select Difficulty Level:</label>
+        <select id="difficulty" name="difficulty" required>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+    </div>
+
+    <div>
+        <button type="submit">Start Game</button>
+    </div>
+</form>
+
+<!-- Additional instructions or information for the user -->
+<p>Choose your desired board size and difficulty level, then click "Start Game" to begin playing Minesweeper! Good luck!</p>
