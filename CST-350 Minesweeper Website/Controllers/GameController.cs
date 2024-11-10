@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using CST_350_Minesweeper_Website.Models;
+using Newtonsoft.Json;
 
 public class GameController : Controller
 {
-    // No concurrent users means that we can use static instead of an HTML getter and setter
-    static BoardModel? board;
     private static bool gameStarted;
     private static bool gameIsOver;
     private static int cellsLeft;
@@ -35,7 +34,7 @@ public class GameController : Controller
     /// <returns></returns>
 	public IActionResult Board()
 	{
-		return View("Board", board);
+		return View("Board", GetBoard());
 	}
     // ---------------------------------------------- END OF BOARD VIEW ---------------------------------------------- //
 
@@ -62,7 +61,7 @@ public class GameController : Controller
     /// <param name="difficulty"></param>
     /// <returns></returns>
     [HttpPost]
-    public IActionResult Start(string boardSize, string difficulty)
+    public IActionResult Initialize(string boardSize, string difficulty)
     {
         // Convert the board size string to an int
         int boardSizeInt = 0;
@@ -81,20 +80,30 @@ public class GameController : Controller
             case "hard": difficultyInt = 20; break;
         }
         // Create the board
-        board = new BoardModel(boardSizeInt, difficultyInt);
+        BoardModel board = new BoardModel(boardSizeInt, difficultyInt);
         gameStarted = false; gameIsOver = false;
         HttpContext.Session.SetString("GameStarted", "false");
-
+        SaveBoard(board);
         // If game is started, load the GameBoard view
         return RedirectToAction("Board");
     }
     // ---------------------------------------------- END OF START ACTION -------------------------------------------- //
 
-    // Might move this to a GameController class in the future
-    // Add this new action for StartGame
+    // ------------------------------------------------- RESTART ACTION ---------------------------------------------- //
+    /// <summary>
+    /// Action to restart the game and remove the board
+    /// </summary>
+    /// <returns></returns>
+    public IActionResult Start()
+    {
+        HttpContext.Session.Remove("Board");
+        HttpContext.Session.SetString("GameStarted", "false");
+        return RedirectToAction("Index", "Theme");
+    }
+    // ---------------------------------------------- END OF RESTART ACTION ------------------------------------------ //
+
     public IActionResult Configure()
 	{
-		// Otherwise, return the StartGame view
 		return View();
 	}
 
@@ -138,7 +147,9 @@ public class GameController : Controller
 		int row = Convert.ToInt32(parts[0]);
 		int col = Convert.ToInt32(parts[1]);
 
-        // Generate the bombs if the game has started
+        BoardModel board = GetBoard();
+
+        // Generate the bombs if the game hasn't been started
 		if (!gameStarted)
         {
             board.GenerateBombs(row, col);
@@ -150,8 +161,13 @@ public class GameController : Controller
         CellModel cell = board.Grid[row, col];
 		// Update the board
 		(gameIsOver, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
+        // Save the board state
+        SaveBoard(board);
+
         if (gameIsOver)
         {
+            HttpContext.Session.Remove("Board");
+            HttpContext.Session.SetString("GameStarted", "false");
             // Create a bool to determine the game end state
             bool gameWon = cellsLeft == 0;
             if (gameWon)
@@ -166,4 +182,38 @@ public class GameController : Controller
 		return RedirectToAction("Board");
 	}
     // -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
+
+    // ------------------------------------------------ GET BOARD METHOD ----------------------------------------------- //
+    /// <summary>
+    /// Retrieve the board from the session variable
+    /// </summary>
+    /// <returns></returns>
+    private BoardModel GetBoard()
+    {
+        // Retrieve the serialized board string from the session
+        var boardJson = HttpContext.Session.GetString("Board");
+
+        if (string.IsNullOrEmpty(boardJson))
+            return null; // If no board is found, return null
+
+        // Deserialize the JSON string to BoardModel and return it
+        var board = JsonConvert.DeserializeObject<BoardModel>(boardJson);
+        return board;
+    }
+    // --------------------------------------------- END OF GET BOARD METHOD -------------------------------------------- //
+
+    // ------------------------------------------------ SAVE BOARD METHOD ----------------------------------------------- //
+    /// <summary>
+    /// Save the board to the session variable
+    /// </summary>
+    /// <param name="board"></param>
+    private void SaveBoard(BoardModel board)
+    {
+        // Serialize the BoardModel to a JSON string
+        var boardJson = JsonConvert.SerializeObject(board);
+
+        // Store the serialized string in the session
+        HttpContext.Session.SetString("Board", boardJson);
+    }
+    // --------------------------------------------- END OF SAVE BOARD METHOD ------------------------------------------- //
 }
