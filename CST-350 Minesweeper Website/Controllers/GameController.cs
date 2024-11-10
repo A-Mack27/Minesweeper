@@ -45,7 +45,7 @@ public class GameController : Controller
     /// <returns></returns>
     public IActionResult Resume()
     {
-        if (!gameStarted)
+        if (HttpContext.Session.GetString("Board") != null)
         {
             return RedirectToAction("Index", "Theme");
         }
