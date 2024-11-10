@@ -1,34 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using CST_350_Minesweeper_Website.Models;
 
 public class GameController : Controller
 {
+    // No concurrent users means that we can use static instead of an HTML getter and setter
+    static BoardModel? board;
+    private static bool gameStarted = false;
+    public IActionResult Index()
+    {
+        return View("Index", board);
+    }
+
     // This action handles the form submission from StartGame.cshtml.
     // It stores the board size and difficulty level in session variables.
     [HttpPost]
     public IActionResult Start(string boardSize, string difficulty)
     {
-        // Store settings in session for later use
-        HttpContext.Session.SetString("BoardSize", boardSize);
-        HttpContext.Session.SetString("Difficulty", difficulty);
-
-        // Redirect to the GameBoard page where the game will be displayed
-        return RedirectToAction("GameBoard");
-    }
-
-    // This action is used to display the Minesweeper game board.
-    // It checks if the user has selected a board size, otherwise redirects to StartGame.
-    public IActionResult GameBoard()
-    {
-        // Check if the board size is set in the session to validate access
-        if (string.IsNullOrEmpty(HttpContext.Session.GetString("BoardSize")))
+        // Convert the board size string to an int
+        int boardSizeInt = 0;
+        switch (boardSize)
         {
-            // If no game has been started, redirect to StartGame page
-            return RedirectToAction("StartGame", "Home");
+            case "small": boardSizeInt = 10; break;
+            case "medium": boardSizeInt = 15; break;
+            case "large": boardSizeInt = 20; break;
         }
+        // Convert the board difficulty to an int
+        int difficultyInt = 0;
+        switch (difficulty)
+        {
+            case "easy": difficultyInt = 10; break;
+            case "medium": difficultyInt = 15; break;
+            case "hard": difficultyInt = 20; break;
+        }
+        // Create the board
+        board = new BoardModel(boardSizeInt, difficultyInt);
+        // Store the board in a session variable
 
         // If game is started, load the GameBoard view
-        return View();
+        return RedirectToAction("Index");
     }
 
     // This action displays the Win page and calculates the final score.
@@ -59,13 +69,26 @@ public class GameController : Controller
 
     // This action handles revealing a cell on the game board.
     // It returns JSON data to update the game board dynamically.
-    public JsonResult RevealCell(int row, int col)
+    [HttpPost]
+    public IActionResult RevealCell(string cellLocation)
     {
-        // Retrieve game state and reveal cell content based on Minesweeper logic
-        var content = "1";
-        
+        // Get the location of the cell clicked on
+		var parts = cellLocation.Split(',');
+		int row = Convert.ToInt32(parts[0]);
+		int col = Convert.ToInt32(parts[1]);
 
-        // Return content as JSON data for client-side processing
-        return Json(new { content });
-    }
+        // Generate the bombs if the game has started
+		if (!gameStarted)
+        {
+            board.GenerateBombs(row, col);
+            gameStarted = true;
+        }
+
+        // Get the cell object at the location
+        CellModel cell = board.Grid[row, col];
+        // Update the board
+        board.UpdateBoard(row, col, false, false);
+        // Display the board
+		return RedirectToAction("Index");
+	}
 }

@@ -24,10 +24,20 @@ body {
 /* ------------------------------- */
 /*  Styles for Button Grid Layout  */
 /* ------------------------------- */
-.game-button
+.small-game-button
 {
-    width: 75px;
-    height: 75px;
+    width: 70px;
+    height: 70px;
+}
+.medium-game-button
+{
+    width: 50px;
+    height: 50px;
+}
+.large-game-button
+{
+    width: 40px;
+    height: 40px;
 }
 .button-zone 
 {

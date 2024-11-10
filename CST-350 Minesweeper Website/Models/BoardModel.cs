@@ -9,8 +9,12 @@
 		public decimal Difficulty { get; set; }
 		public int InitialBombCount { get; set; }
 
-		// Parameterized constructor
-		public BoardModel(int s, int d)
+        /// <summary>
+        /// Parameterized constructor
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="d"></param>
+        public BoardModel(int s, int d)
 		{
 			Difficulty = d;
 			Size = s;
