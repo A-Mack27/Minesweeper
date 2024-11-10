@@ -11,13 +11,56 @@ public class GameController : Controller
     private static int cellsLeft;
 	private static int bombCount;
 
+    // ------------------------------------------------- INDEX VIEW -------------------------------------------------- //
+    /// <summary>
+    /// Index view of the game controller
+    /// </summary>
+    /// <returns></returns>
 	public IActionResult Index()
     {
-        return View("Index", board);
+        // Check if the user session is active
+        if (HttpContext.Session.GetString("User") == null)
+        {
+            // If no session, redirect to login page
+            return RedirectToAction("Index", "Login");
+        }
+        return View();
     }
+    // ---------------------------------------------- END OF INDEX VIEW ---------------------------------------------- //
 
-    // This action handles the form submission from StartGame.cshtml.
-    // It stores the board size and difficulty level in session variables.
+    // ------------------------------------------------- BOARD VIEW -------------------------------------------------- //
+    /// <summary>
+    /// Action to show the board
+    /// </summary>
+    /// <returns></returns>
+	public IActionResult Board()
+	{
+		return View("Board", board);
+	}
+    // ---------------------------------------------- END OF BOARD VIEW ---------------------------------------------- //
+
+    // ------------------------------------------------ RESUME ACTION ------------------------------------------------ //
+    /// <summary>
+    /// Action to handle the resume button
+    /// </summary>
+    /// <returns></returns>
+    public IActionResult Resume()
+    {
+        if (!gameStarted)
+        {
+            return RedirectToAction("Index", "Theme");
+        }
+        return RedirectToAction("Board", "Game");
+    }
+    // --------------------------------------------- END OF RESUME ACTION -------------------------------------------- //
+
+    // ------------------------------------------------- START ACTION ------------------------------------------------ //
+    /// <summary>
+    /// Action to start the game
+    /// </summary>
+    /// <param name="boardSize"></param>
+    /// <param name="difficulty"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult Start(string boardSize, string difficulty)
     {
@@ -40,23 +83,17 @@ public class GameController : Controller
         // Create the board
         board = new BoardModel(boardSizeInt, difficultyInt);
         gameStarted = false; gameIsOver = false;
-        // Store the board in a session variable
+        HttpContext.Session.SetString("GameStarted", "false");
 
         // If game is started, load the GameBoard view
-        return RedirectToAction("Index");
+        return RedirectToAction("Board");
     }
+    // ---------------------------------------------- END OF START ACTION -------------------------------------------- //
 
-	// Might move this to a GameController class in the future
-	// Add this new action for StartGame
-	public IActionResult StartGame()
+    // Might move this to a GameController class in the future
+    // Add this new action for StartGame
+    public IActionResult Configure()
 	{
-		// Check if the user session is active
-		if (HttpContext.Session.GetString("User") == null)
-		{
-			// If no session, redirect to login page
-			return RedirectToAction("Index", "Login");
-		}
-
 		// Otherwise, return the StartGame view
 		return View();
 	}
@@ -87,6 +124,7 @@ public class GameController : Controller
         return 100;
     }
 
+    // ---------------------------------------------- REVEAL CELL ACTION --------------------------------------------- //
     /// <summary>
     /// Reveals a cell on the grid and updates the view
     /// </summary>
@@ -105,7 +143,8 @@ public class GameController : Controller
         {
             board.GenerateBombs(row, col);
             gameStarted = true;
-        }
+            HttpContext.Session.SetString("GameStarted", "true");
+		}
 
         // Get the cell object at the location
         CellModel cell = board.Grid[row, col];
@@ -124,6 +163,7 @@ public class GameController : Controller
 			return RedirectToAction("Loss");
 		}
         // Continue by displaying the board if the game isn't over
-		return RedirectToAction("Index");
+		return RedirectToAction("Board");
 	}
+    // -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
 }

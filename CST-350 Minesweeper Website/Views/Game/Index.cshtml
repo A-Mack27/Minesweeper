@@ -1,50 +1,18 @@
-﻿@model CST_350_Minesweeper_Website.Models.BoardModel
-
-@{
-	CellModel cell;
-	string buttonClass = "";
-	string buttonColor = "";
-	switch (Model.Size)
-	{
-		case 10: buttonClass = "small-game-button"; break;
-		case 15: buttonClass = "medium-game-button"; break;
-		case 20: buttonClass = "large-game-button"; break;
-	}
+﻿@{
+    ViewData["Title"] = "Start Game";
 }
 
-@* Surround the entire board as a form that can be submitted *@
+<h1>Please choose to either start a new game or resume your current game</h1>
 
-<form style="background-color: @Context.Session.GetString("FormColor")" method="post">
-	<div class="button-zone">
-		@* Iterate over the buttons and display them *@
-
-		@for (int i = 0; i < Model.Size; i++)
-		{	
-			for (int j = 0; j < Model.Size; j++)
-			{
-				cell = Model.Grid[i, j];
-				if ((i + j) % 2 == 0)
-				{
-					if (cell.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor1");
-					else buttonColor = Context.Session.GetString("UnvisitedColor1");
-				}
-				else
-				{
-					if (cell.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor2");
-					else buttonColor = Context.Session.GetString("UnvisitedColor2");
-				}
-				<button class="@buttonClass" type="submit" style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor")" name="cellLocation" value="@i,@j" asp-controller="Game" asp-action="RevealCell">
-					<div class="button-label">
-						@if (cell.IsRevealed && (cell.LiveNeighbors > 0))
-						{
-							@cell.LiveNeighbors
-						}
-						
-					</div>
-				</button>
-			}
-			// Add a break
-			<div class="line-break"></div>
-		}
-	</div>
+<form method="post">
+    <div>
+        <h3>Resume playing</h3>
+        <button class="btn btn-primary" type="submit" asp-controller="Game" asp-action="Resume">Resume</button>
+    </div>
+    <br />
+    <div>
+        <h3>Start a new game</h3>
+        <p>!! Warning, this will override your current game if you're already playing !!</p>
+        <button class="btn btn-primary" type="submit" asp-controller="Theme" asp-action="Index">Start New</button>
+    </div>
 </form>

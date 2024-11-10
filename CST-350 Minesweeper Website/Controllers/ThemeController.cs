@@ -27,6 +27,8 @@ namespace CST_350_Minesweeper_Website.Controllers
         /// <returns></returns>
 		public IActionResult ApplyTheme(string themeIndex)
 		{
+            if (HttpContext.Session.GetString("User") == null)
+                return RedirectToAction("Index", "Login");
             // Parse the theme index and get the selected theme
             int theme = int.Parse(themeIndex);
             var selectedTheme = Themes[theme];
@@ -41,7 +43,9 @@ namespace CST_350_Minesweeper_Website.Controllers
             HttpContext.Session.SetString("TextColor", selectedTheme.ConvertColorToCSS(selectedTheme.TextColor));
 
             // Refresh the page
-            return RedirectToAction("StartGame", "Game");
+            if (HttpContext.Session.GetString("GameStarted") == "true")
+                return RedirectToAction("Board", "Game");
+            return RedirectToAction("Configure", "Game");
 		}
 
         /// <summary>
