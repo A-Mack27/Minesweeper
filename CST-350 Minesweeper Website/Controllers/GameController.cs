@@ -21,7 +21,7 @@ public class GameController : Controller
         // Check if the user session is active
         if (HttpContext.Session.GetString("User") == null)
         {
-            // If no session, redirect to login page
+            // If the user isn't logged in, redirect them to the login page
             return RedirectToAction("Index", "Login");
         }
         return View();
