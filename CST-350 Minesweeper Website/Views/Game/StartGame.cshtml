@@ -7,6 +7,10 @@
 <!-- Form to select board size and difficulty level -->
 <form method="post" action="/Game/Start">
     <div>
+        Selected Theme: @Context.Session.GetString("SelectedTheme")
+    </div>
+
+    <div>
         <label for="boardSize">Select Board Size:</label>
         <select id="boardSize" name="boardSize" required>
             <option value="small">Small</option>

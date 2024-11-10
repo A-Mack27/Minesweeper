@@ -3,6 +3,7 @@
 @{
 	CellModel cell;
 	string buttonClass = "";
+	string buttonColor = "";
 	switch (Model.Size)
 	{
 		case 10: buttonClass = "small-game-button"; break;
@@ -12,21 +13,28 @@
 }
 
 @* Surround the entire board as a form that can be submitted *@
-<form method="post">
+
+<form style="background-color: @Context.Session.GetString("FormColor")" method="post">
 	<div class="button-zone">
 		@* Iterate over the buttons and display them *@
 
 		@for (int i = 0; i < Model.Size; i++)
-		{
-			
-			@for (int j = 0; j < Model.Size; j++)
+		{	
+			for (int j = 0; j < Model.Size; j++)
 			{
-				<button class="@buttonClass" type="submit" name="cellLocation" value="@i,@j" asp-controller="Game" asp-action="RevealCell">
+				cell = Model.Grid[i, j];
+				if ((i + j) % 2 == 0)
+				{
+					if (cell.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor1");
+					else buttonColor = Context.Session.GetString("UnvisitedColor1");
+				}
+				else
+				{
+					if (cell.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor2");
+					else buttonColor = Context.Session.GetString("UnvisitedColor2");
+				}
+				<button class="@buttonClass" type="submit" style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor")" name="cellLocation" value="@i,@j" asp-controller="Game" asp-action="RevealCell">
 					<div class="button-label">
-						@{
-							cell = Model.Grid[i, j];
-
-						}
 						@if (cell.IsRevealed && (cell.LiveNeighbors > 0))
 						{
 							@cell.LiveNeighbors

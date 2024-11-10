@@ -6,8 +6,12 @@ public class GameController : Controller
 {
     // No concurrent users means that we can use static instead of an HTML getter and setter
     static BoardModel? board;
-    private static bool gameStarted = false;
-    public IActionResult Index()
+    private static bool gameStarted;
+    private static bool gameIsOver;
+    private static int cellsLeft;
+	private static int bombCount;
+
+	public IActionResult Index()
     {
         return View("Index", board);
     }
@@ -35,14 +39,30 @@ public class GameController : Controller
         }
         // Create the board
         board = new BoardModel(boardSizeInt, difficultyInt);
+        gameStarted = false; gameIsOver = false;
         // Store the board in a session variable
 
         // If game is started, load the GameBoard view
         return RedirectToAction("Index");
     }
 
-    // This action displays the Win page and calculates the final score.
-    public IActionResult Win()
+	// Might move this to a GameController class in the future
+	// Add this new action for StartGame
+	public IActionResult StartGame()
+	{
+		// Check if the user session is active
+		if (HttpContext.Session.GetString("User") == null)
+		{
+			// If no session, redirect to login page
+			return RedirectToAction("Index", "Login");
+		}
+
+		// Otherwise, return the StartGame view
+		return View();
+	}
+
+	// This action displays the Win page and calculates the final score.
+	public IActionResult Win()
     {
         // Calculate score based on game parameters
         int score = CalculateScore();
@@ -67,8 +87,11 @@ public class GameController : Controller
         return 100;
     }
 
-    // This action handles revealing a cell on the game board.
-    // It returns JSON data to update the game board dynamically.
+    /// <summary>
+    /// Reveals a cell on the grid and updates the view
+    /// </summary>
+    /// <param name="cellLocation"></param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult RevealCell(string cellLocation)
     {
@@ -86,9 +109,21 @@ public class GameController : Controller
 
         // Get the cell object at the location
         CellModel cell = board.Grid[row, col];
-        // Update the board
-        board.UpdateBoard(row, col, false, false);
-        // Display the board
+		// Update the board
+		(gameIsOver, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
+        if (gameIsOver)
+        {
+            // Create a bool to determine the game end state
+            bool gameWon = cellsLeft == 0;
+            if (gameWon)
+            {
+                // Send the user to the win screen if they won
+                return RedirectToAction("Win");
+            }
+            // Send them to the lost screen if they lost
+			return RedirectToAction("Loss");
+		}
+        // Continue by displaying the board if the game isn't over
 		return RedirectToAction("Index");
 	}
 }
