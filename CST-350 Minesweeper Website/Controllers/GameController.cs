@@ -107,16 +107,18 @@ public class GameController : Controller
 		return View();
 	}
 
-	// This action displays the Win page and calculates the final score.
-	public IActionResult Win()
+    // --------------------------------------------------- WIN VIEW -------------------------------------------------- //
+    public IActionResult Win()
     {
         // Calculate score based on game parameters
         int score = CalculateScore();
-        ViewBag.Score = score; // Pass score to the view using ViewBag
-
+        // Remove the board from the session
+        HttpContext.Session.Remove("Board"); 
         // Show Win page with the score
-        return View();
+        return View(score);
     }
+    // ------------------------------------------------ END OF WIN VIEW ---------------------------------------------- //
+
 
     // This action displays the Loss page when the player loses the game.
     public IActionResult Loss()
@@ -125,13 +127,26 @@ public class GameController : Controller
         return View();
     }
 
-    // This helper method calculates the score for the game.
-    // Replace with actual score calculation logic based on game requirements.
+    // ------------------------------------------------ END OF WIN VIEW ---------------------------------------------- //
+
+    // -------------------------------------------- CALCULATE SCORE METHOD ------------------------------------------- //
+    /// <summary>
+    /// Calculates the score after a game is won
+    /// </summary>
+    /// <returns></returns>
     private int CalculateScore()
     {
-        // Example score calculation (replace with real logic)
-        return 100;
+        // Aquire all the relevant variables
+        BoardModel board = GetBoard();
+        TimeSpan elapsedTime = DateTime.Now - DateTime.Parse(HttpContext.Session.GetString("StartTime"));
+        int baseScore = 10000;
+        double sizeMulti = (double)board.Size / 10;
+        double diffMulti = (double)board.Difficulty / 10;
+        // Score formula
+        double score = (baseScore * sizeMulti * diffMulti) / (elapsedTime.TotalSeconds + 1); // +1 so we don't divide by 0
+        return (int)score; // Cast as an int to get a whole number
     }
+    // ----------------------------------------- END OF CALCULATE SCORE METHOD --------------------------------------- //
 
     // ---------------------------------------------- REVEAL CELL ACTION --------------------------------------------- //
     /// <summary>
@@ -152,10 +167,11 @@ public class GameController : Controller
         // Generate the bombs if the game hasn't been started
 		if (!gameStarted)
         {
-            board.GenerateBombs(row, col);
-            gameStarted = true;
-            HttpContext.Session.SetString("GameStarted", "true");
-		}
+            board.GenerateBombs(row, col); // Generate the bombs based on the start location
+            gameStarted = true; // Set the local game started variable to true
+            HttpContext.Session.SetString("GameStarted", "true"); // set the session start variable to true
+            HttpContext.Session.SetString("StartTime", DateTime.Now.ToString()); // Save the start time in a string
+        }
 
         // Get the cell object at the location
         CellModel cell = board.Grid[row, col];
@@ -166,7 +182,6 @@ public class GameController : Controller
 
         if (gameIsOver)
         {
-            HttpContext.Session.Remove("Board");
             HttpContext.Session.SetString("GameStarted", "false");
             // Create a bool to determine the game end state
             bool gameWon = cellsLeft == 0;
