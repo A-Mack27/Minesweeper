@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using CST_350_Minesweeper_Website.Models;
 using Newtonsoft.Json;
+using CST_350_Minesweeper_Website.Services.Business;
 
 public class GameController : Controller
 {
@@ -80,7 +80,7 @@ public class GameController : Controller
             case "hard": difficultyInt = 20; break;
         }
         // Create the board
-        BoardModel board = new BoardModel(boardSizeInt, difficultyInt);
+        Board board = new Board(boardSizeInt, difficultyInt);
         gameStarted = false; gameIsOver = false;
         HttpContext.Session.SetString("GameStarted", "false");
         SaveBoard(board);
@@ -137,7 +137,7 @@ public class GameController : Controller
     private int CalculateScore()
     {
         // Aquire all the relevant variables
-        BoardModel board = GetBoard();
+        Board board = GetBoard();
         TimeSpan elapsedTime = DateTime.Now - DateTime.Parse(HttpContext.Session.GetString("StartTime"));
         int baseScore = 10000;
         double sizeMulti = (double)board.Size / 10;
@@ -162,7 +162,7 @@ public class GameController : Controller
 		int row = Convert.ToInt32(parts[0]);
 		int col = Convert.ToInt32(parts[1]);
 
-        BoardModel board = GetBoard();
+        Board board = GetBoard();
 
         // Generate the bombs if the game hasn't been started
 		if (!gameStarted)
@@ -174,7 +174,7 @@ public class GameController : Controller
         }
 
         // Get the cell object at the location
-        CellModel cell = board.Grid[row, col];
+        Cell cell = board.Grid[row, col];
 		// Update the board
 		(gameIsOver, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
         // Save the board state
@@ -203,7 +203,7 @@ public class GameController : Controller
     /// Retrieve the board from the session variable
     /// </summary>
     /// <returns></returns>
-    private BoardModel GetBoard()
+    private Board GetBoard()
     {
         // Retrieve the serialized board string from the session
         var boardJson = HttpContext.Session.GetString("Board");
@@ -212,7 +212,7 @@ public class GameController : Controller
             return null; // If no board is found, return null
 
         // Deserialize the JSON string to BoardModel and return it
-        var board = JsonConvert.DeserializeObject<BoardModel>(boardJson);
+        var board = JsonConvert.DeserializeObject<Board>(boardJson);
         return board;
     }
     // --------------------------------------------- END OF GET BOARD METHOD -------------------------------------------- //
@@ -222,7 +222,7 @@ public class GameController : Controller
     /// Save the board to the session variable
     /// </summary>
     /// <param name="board"></param>
-    private void SaveBoard(BoardModel board)
+    private void SaveBoard(Board board)
     {
         // Serialize the BoardModel to a JSON string
         var boardJson = JsonConvert.SerializeObject(board);

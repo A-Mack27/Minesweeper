@@ -1,7 +1,4 @@
-﻿@model CST_350_Minesweeper_Website.Models.BoardModel
-
-@{
-	CellModel cell;
+﻿@{
 	string buttonClass = "";
 	string buttonColor = "";
 	switch (Model.Size)
@@ -21,7 +18,7 @@
 		{
 			for (int j = 0; j < Model.Size; j++)
 			{
-				cell = Model.Grid[i, j];
+				var cell = Model.Grid[i, j];
 				// Determine the color of the cell
 				if ((i + j) % 2 == 0)
 				{
