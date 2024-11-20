@@ -24,30 +24,6 @@ body {
 /* ------------------------------- */
 /*  Styles for Button Grid Layout  */
 /* ------------------------------- */
-.small-game-button 
-{
-    border: none;
-    padding: 0;
-    margin: 0;
-    width: 70px;
-    height: 70px;
-}
-.medium-game-button
-{
-    border: none;
-    padding: 0;
-    margin: 0;
-    width: 50px;
-    height: 50px;
-}
-.large-game-button 
-{
-    border: none;
-    padding: 0;
-    margin: 0;
-    width: 40px;
-    height: 40px;
-}
 .button-zone 
 {
     display: flex;
@@ -64,4 +40,10 @@ body {
     text-align: center;
     font-family: "Cascadia Mono", monospace;
     font-weight: bold;
+}
+.button-label img 
+{
+    max-width: 100%; /* Ensure the image fills the button container */
+    max-height: 100%; /* Ensure the image doesn’t overflow vertically */
+    object-fit: contain; /* Keep aspect ratio and scale image to fit within the box */
 }

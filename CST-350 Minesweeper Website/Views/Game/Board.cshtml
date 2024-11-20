@@ -1,13 +1,25 @@
 ﻿@{
-	string buttonClass = "";
+	string buttonSize = "";
 	string buttonColor = "";
 	switch (Model.Size)
 	{
-		case 10: buttonClass = "small-game-button"; break;
-		case 15: buttonClass = "medium-game-button"; break;
-		case 20: buttonClass = "large-game-button"; break;
+		case 10: buttonSize = "70px"; break;
+		case 15: buttonSize = "50px"; break;
+		case 20: buttonSize = "40px"; break;
 	}
 }
+
+<style>
+	.cell-class
+	{
+		border: none;
+		padding: 0;
+		margin: 0;
+		width: @buttonSize;
+		height: @buttonSize;
+	}
+</style>
+
 
 @* Surround the entire board as a form that can be submitted *@
 <form style="background-color: @Context.Session.GetString("FormColor");" method="post">
@@ -31,9 +43,18 @@
 					else buttonColor = Context.Session.GetString("UnvisitedColor2");
 				}
 				// Create the button
-				<button class="@buttonClass" type="submit" style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor")" name="cellLocation" value="@i,@j" asp-controller="Game" asp-action="RevealCell">
+				<button class="cell-class" type="submit"
+						style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor")"
+						name="cellLocation" value="@i,@j"
+						asp-controller="Game" asp-action="HandleClick"
+						onclick="return handleMouseClick(event)">
 					<div class="button-label">
-						@if (cell.IsRevealed && (cell.LiveNeighbors > 0))
+						@if (cell.IsFlagged)
+						{
+							<img src="~/images/Flag.png" alt="Flagged" />
+
+						}
+						else if (cell.IsRevealed && (cell.LiveNeighbors > 0))
 						{
 							// Display the live neighbor count
 							@cell.LiveNeighbors
