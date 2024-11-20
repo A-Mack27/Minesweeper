@@ -32,7 +32,11 @@
 			{
 				var cell = Model.Grid[i, j];
 				// Determine the color of the cell
-				if ((i + j) % 2 == 0)
+				if (cell.IsFlagged)
+				{
+					buttonColor = "tomato";
+				}
+				else if ((i + j) % 2 == 0)
 				{
 					if (cell.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor1");
 					else buttonColor = Context.Session.GetString("UnvisitedColor1");
@@ -46,8 +50,7 @@
 				<button class="cell-class" type="submit"
 						style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor")"
 						name="cellLocation" value="@i,@j"
-						asp-controller="Game" asp-action="HandleClick"
-						onclick="return handleMouseClick(event)">
+						asp-controller="Game" asp-action="RevealCell">
 					<div class="button-label">
 						@if (cell.IsFlagged)
 						{
