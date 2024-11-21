@@ -18,7 +18,8 @@ namespace CST_350_Minesweeper_Website.Controllers
         /// <returns></returns>
         public IActionResult Logout()
         {
-            HttpContext.Session.Remove("User");
+            // Remove all session variables and return them to the home page
+            HttpContext.Session.Clear();
             return View("Index");
         }
 

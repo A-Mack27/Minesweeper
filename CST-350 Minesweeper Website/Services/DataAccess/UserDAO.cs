@@ -9,13 +9,6 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
         // Define the connection string for MSSQL
         static string conn = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=UserProfile;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
-        // Define the connection string
-        static string serverName = "localhost";
-        static string username = "root";
-        static string password = "root";
-        static string dbName = "userprofile";
-        static string port = "8889"; // Change this depending on your MySQL port number
-
         /// <summary>
         /// Add new user
         /// </summary>

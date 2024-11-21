@@ -1,8 +1,30 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+﻿<div class="text-center">
+    <h1 class="display-4">Welcome to MINESWEEPER!</h1>
 </div>
+<br />
+<br />
+<form method="post">
+    <div>
+        <h3>New? Register now!</h3>
+        <div>
+            <button type="submit" asp-controller="Register" asp-action="Index" class="btn btn-primary">
+                Create your account
+            </button>
+        </div>
+    </div>
+    <br />
+    <div>
+        <h3>Already a user? Sign in!</h3>
+        <div>
+            <button type="submit" asp-controller="Login" asp-action="Index" class="btn btn-primary">
+                Login
+            </button>
+        </div>
+    </div>
+</form>
+<br />
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2024 - CST_350_Minesweeper_Website - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
+</footer>

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -8,13 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
-    <PackageReference Include="ServiceStack.Text" Version="8.4.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+    <None Include="wwwroot\images\Bomb.ico" />
+    <None Include="wwwroot\images\Bomb.png" />
+    <None Include="wwwroot\images\Flag.png" />
+    <None Include="wwwroot\images\Settings Icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Business\" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+    <PackageReference Include="ServiceStack.Text" Version="8.4.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
 
 </Project>

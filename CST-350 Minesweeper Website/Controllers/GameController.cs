@@ -1,47 +1,124 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using CST_350_Minesweeper_Website.Models;
+using Newtonsoft.Json;
+using CST_350_Minesweeper_Website.Services.Business;
 
 public class GameController : Controller
 {
-    // This action handles the form submission from StartGame.cshtml.
-    // It stores the board size and difficulty level in session variables.
-    [HttpPost]
-    public IActionResult Start(string boardSize, string difficulty)
-    {
-        // Store settings in session for later use
-        HttpContext.Session.SetString("BoardSize", boardSize);
-        HttpContext.Session.SetString("Difficulty", difficulty);
+    private static bool gameStarted;
+    private static bool gameIsOver;
+    private static int cellsLeft;
+	private static int bombCount;
 
-        // Redirect to the GameBoard page where the game will be displayed
-        return RedirectToAction("GameBoard");
-    }
-
-    // This action is used to display the Minesweeper game board.
-    // It checks if the user has selected a board size, otherwise redirects to StartGame.
-    public IActionResult GameBoard()
+    // ------------------------------------------------- INDEX VIEW -------------------------------------------------- //
+    /// <summary>
+    /// Index view of the game controller
+    /// </summary>
+    /// <returns></returns>
+	public IActionResult Index()
     {
-        // Check if the board size is set in the session to validate access
-        if (string.IsNullOrEmpty(HttpContext.Session.GetString("BoardSize")))
+        // Check if the user session is active
+        if (HttpContext.Session.GetString("User") == null)
         {
-            // If no game has been started, redirect to StartGame page
-            return RedirectToAction("StartGame", "Home");
+            // If the user isn't logged in, redirect them to the login page
+            return RedirectToAction("Index", "Login");
         }
-
-        // If game is started, load the GameBoard view
         return View();
     }
+    // ---------------------------------------------- END OF INDEX VIEW ---------------------------------------------- //
 
-    // This action displays the Win page and calculates the final score.
+    // ------------------------------------------------- BOARD VIEW -------------------------------------------------- //
+    /// <summary>
+    /// Action to show the board
+    /// </summary>
+    /// <returns></returns>
+	public IActionResult Board()
+	{
+		return View("Board", GetBoard());
+	}
+    // ---------------------------------------------- END OF BOARD VIEW ---------------------------------------------- //
+
+    // ------------------------------------------------ RESUME ACTION ------------------------------------------------ //
+    /// <summary>
+    /// Action to handle the resume button
+    /// </summary>
+    /// <returns></returns>
+    public IActionResult Resume()
+    {
+        if (HttpContext.Session.GetString("Board") != null)
+        {
+            return RedirectToAction("Index", "Theme");
+        }
+        return RedirectToAction("Board", "Game");
+    }
+    // --------------------------------------------- END OF RESUME ACTION -------------------------------------------- //
+
+    // ------------------------------------------------- START ACTION ------------------------------------------------ //
+    /// <summary>
+    /// Action to start the game
+    /// </summary>
+    /// <param name="boardSize"></param>
+    /// <param name="difficulty"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public IActionResult Initialize(string boardSize, string difficulty)
+    {
+        // Convert the board size string to an int
+        int boardSizeInt = 0;
+        switch (boardSize)
+        {
+            case "small": boardSizeInt = 10; break;
+            case "medium": boardSizeInt = 15; break;
+            case "large": boardSizeInt = 20; break;
+        }
+        // Convert the board difficulty to an int
+        int difficultyInt = 0;
+        switch (difficulty)
+        {
+            case "easy": difficultyInt = 10; break;
+            case "medium": difficultyInt = 15; break;
+            case "hard": difficultyInt = 20; break;
+        }
+        // Create the board
+        Board board = new Board(boardSizeInt, difficultyInt);
+        gameStarted = false; gameIsOver = false;
+        HttpContext.Session.SetString("GameStarted", "false");
+        SaveBoard(board);
+        // If game is started, load the GameBoard view
+        return RedirectToAction("Board");
+    }
+    // ---------------------------------------------- END OF START ACTION -------------------------------------------- //
+
+    // ------------------------------------------------- RESTART ACTION ---------------------------------------------- //
+    /// <summary>
+    /// Action to restart the game and remove the board
+    /// </summary>
+    /// <returns></returns>
+    public IActionResult Start()
+    {
+        HttpContext.Session.Remove("Board");
+        HttpContext.Session.SetString("GameStarted", "false");
+        return RedirectToAction("Index", "Theme");
+    }
+    // ---------------------------------------------- END OF RESTART ACTION ------------------------------------------ //
+
+    public IActionResult Configure()
+	{
+		return View();
+	}
+
+    // --------------------------------------------------- WIN VIEW -------------------------------------------------- //
     public IActionResult Win()
     {
         // Calculate score based on game parameters
         int score = CalculateScore();
-        ViewBag.Score = score; // Pass score to the view using ViewBag
-
+        // Remove the board from the session
+        HttpContext.Session.Remove("Board"); 
         // Show Win page with the score
-        return View();
+        return View(score);
     }
+    // ------------------------------------------------ END OF WIN VIEW ---------------------------------------------- //
+
 
     // This action displays the Loss page when the player loses the game.
     public IActionResult Loss()
@@ -50,39 +127,108 @@ public class GameController : Controller
         return View();
     }
 
-    // This helper method calculates the score for the game.
-    // Replace with actual score calculation logic based on game requirements.
+    // ------------------------------------------------ END OF WIN VIEW ---------------------------------------------- //
+
+    // -------------------------------------------- CALCULATE SCORE METHOD ------------------------------------------- //
+    /// <summary>
+    /// Calculates the score after a game is won
+    /// </summary>
+    /// <returns></returns>
     private int CalculateScore()
     {
-        // Example score calculation (replace with real logic)
-        return 100;
+        // Aquire all the relevant variables
+        Board board = GetBoard();
+        TimeSpan elapsedTime = DateTime.Now - DateTime.Parse(HttpContext.Session.GetString("StartTime"));
+        int baseScore = 10000;
+        double sizeMulti = (double)board.Size / 10;
+        double diffMulti = (double)board.Difficulty / 10;
+        // Score formula
+        double score = (baseScore * sizeMulti * diffMulti) / (elapsedTime.TotalSeconds + 1); // +1 so we don't divide by 0
+        return (int)score; // Cast as an int to get a whole number
     }
+    // ----------------------------------------- END OF CALCULATE SCORE METHOD --------------------------------------- //
 
-    // This action handles revealing a cell on the game board.
-    // It returns JSON data to update the game board dynamically.
-    public JsonResult RevealCell(int row, int col)
+    // ---------------------------------------------- REVEAL CELL ACTION --------------------------------------------- //
+    /// <summary>
+    /// Reveals a cell on the grid and updates the view
+    /// </summary>
+    /// <param name="cellLocation"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public IActionResult RevealCell(string cellLocation)
     {
-        // Retrieve game state and reveal cell content based on Minesweeper logic
-        var content = "1";
-        
+        // Get the location of the cell clicked on
+		var parts = cellLocation.Split(',');
+		int row = Convert.ToInt32(parts[0]);
+		int col = Convert.ToInt32(parts[1]);
 
-        // Return content as JSON data for client-side processing
-        return Json(new { content });
-    }
+        Board board = GetBoard();
 
-    // ADD THIS: Updates a specific cell and returns the partial view for that cell
-    public IActionResult UpdateCell(int row, int col)
-    {
-        // Simulate fetching the cell from your game's logic or state
-        var cell = new CellModel(row, col)
+        // Generate the bombs if the game hasn't been started
+		if (!gameStarted)
         {
-            IsRevealed = true, // Example: Mark the cell as revealed
-            IsLive = false,    // Example: Assume it's not a mine
-            LiveNeighbors = 2  // Example: Assume it has 2 neighboring mines
-        };
+            board.GenerateBombs(row, col); // Generate the bombs based on the start location
+            gameStarted = true; // Set the local game started variable to true
+            HttpContext.Session.SetString("GameStarted", "true"); // set the session start variable to true
+            HttpContext.Session.SetString("StartTime", DateTime.Now.ToString()); // Save the start time in a string
+        }
 
-        // Return the partial view with the cell model
-        return PartialView("_CellPartial", cell);
+        // Get the cell object at the location
+        Cell cell = board.Grid[row, col];
+		// Update the board
+		(gameIsOver, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
+        // Save the board state
+        SaveBoard(board);
+
+        if (gameIsOver)
+        {
+            HttpContext.Session.SetString("GameStarted", "false");
+            // Create a bool to determine the game end state
+            bool gameWon = cellsLeft == 0;
+            if (gameWon)
+            {
+                // Send the user to the win screen if they won
+                return RedirectToAction("Win");
+            }
+            // Send them to the lost screen if they lost
+			return RedirectToAction("Loss");
+		}
+        // Continue by displaying the board if the game isn't over
+		return RedirectToAction("Board");
+	}
+    // -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
+
+    // ------------------------------------------------ GET BOARD METHOD ----------------------------------------------- //
+    /// <summary>
+    /// Retrieve the board from the session variable
+    /// </summary>
+    /// <returns></returns>
+    private Board GetBoard()
+    {
+        // Retrieve the serialized board string from the session
+        var boardJson = HttpContext.Session.GetString("Board");
+
+        if (string.IsNullOrEmpty(boardJson))
+            return null; // If no board is found, return null
+
+        // Deserialize the JSON string to BoardModel and return it
+        var board = JsonConvert.DeserializeObject<Board>(boardJson);
+        return board;
     }
+    // --------------------------------------------- END OF GET BOARD METHOD -------------------------------------------- //
 
+    // ------------------------------------------------ SAVE BOARD METHOD ----------------------------------------------- //
+    /// <summary>
+    /// Save the board to the session variable
+    /// </summary>
+    /// <param name="board"></param>
+    private void SaveBoard(Board board)
+    {
+        // Serialize the BoardModel to a JSON string
+        var boardJson = JsonConvert.SerializeObject(board);
+
+        // Store the serialized string in the session
+        HttpContext.Session.SetString("Board", boardJson);
+    }
+    // --------------------------------------------- END OF SAVE BOARD METHOD ------------------------------------------- //
 }

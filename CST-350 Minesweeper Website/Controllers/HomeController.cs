@@ -2,6 +2,7 @@ using CST_350_Minesweeper_Website.Models;
 using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace CST_350_Minesweeper_Website.Controllers
 {
@@ -16,6 +17,11 @@ namespace CST_350_Minesweeper_Website.Controllers
 
         public IActionResult Index()
         {
+            // If the default theme isn't set, set it here
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("FormColor")))
+            {
+                SetDefaultTheme();
+            }
             return View();
         }
 
@@ -30,19 +36,14 @@ namespace CST_350_Minesweeper_Website.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        // Might move this to a GameController class in the future
-        // Add this new action for StartGame
-        public IActionResult StartGame()
+        public void SetDefaultTheme()
         {
-            // Check if the user session is active
-            if (HttpContext.Session.GetString("User") == null)
-            {
-                // If no session, redirect to login page
-                return RedirectToAction("Index", "Login");
-            }
-
-            // Otherwise, return the StartGame view
-            return View();
+            HttpContext.Session.SetString("FormColor", "rgb(255, 255, 255)");  // Default background color
+            HttpContext.Session.SetString("VisitedColor1", "rgb(219, 219, 219)");  // Default visited color 1
+            HttpContext.Session.SetString("VisitedColor2", "rgb(200, 200, 200)");  // Default visited color 2
+            HttpContext.Session.SetString("UnvisitedColor1", "rgb(131, 131, 131)");  // Default unvisited color 1
+            HttpContext.Session.SetString("UnvisitedColor2", "rgb(115, 115, 115)");  // Default unvisited color 2
+            HttpContext.Session.SetString("TextColor", "rgb(10, 10, 10)");  // Default text color
         }
     }
 }
