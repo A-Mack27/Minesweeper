@@ -1,0 +1,26 @@
+﻿
+
+
+
+
+
+<!-- Partial view for a Minesweeper cell -->
+<button id="cell-@Model.RowNumber-@Model.ColumnNumber"  <!-- Use row and column for ID -->
+    class="cell-button"  <!-- CSS styling class -->
+    onclick="cellClick(@Model.RowNumber, @Model.ColumnNumber)"> <!-- JavaScript function -->
+    @if (Model.IsRevealed)
+    {
+        @Model.LiveNeighbors <!-- Display number of neighboring mines if revealed -->
+    }
+    else
+    {
+        @if (Model.IsFlagged)
+        {
+                    <span>🚩</span> <!-- Display a flag if flagged -->
+        }
+        else
+        {
+                    <span>?</span> <!-- Display a placeholder for unrevealed cells -->
+        }
+    }
+</button>

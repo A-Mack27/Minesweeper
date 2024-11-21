@@ -1,0 +1,65 @@
+﻿@model CST_350_Minesweeper_Website.Models.BoardModel
+
+@{
+    // Set the page title
+    ViewData["Title"] = "Game Board";
+}
+
+<!-- Page Heading -->
+<h1>Game Board</h1>
+
+
+<!-- Timer Section -->
+<!-- Displays the timer at the top of the page -->
+<div id="timer">00:00</div>
+
+<!-- Game Board Section -->
+<!-- Renders the game board dynamically using the model -->
+<div id="game-board">
+    @for (int row = 0; row < Model.Size; row++) // Loop through each row
+    {
+        <div class="row">
+            @for (int col = 0; col < Model.Size; col++) // Loop through each column
+            {
+                <!-- Render each cell using the _CellPartial view -->
+                @Html.Partial("_CellPartial", Model.Grid[row, col])
+            }
+        </div>
+    }
+</div>
+
+<!-- JavaScript Section -->
+<script>
+    // Handles the click event for a cell
+    function cellClick(row, col) {
+        $.ajax({
+            url: '/Game/UpdateCell', // Call the UpdateCell action in GameController
+            type: 'GET',
+            data: { row: row, col: col }, // Pass the row and column as parameters
+            success: function (response) {
+                // Replace the clicked cell with the updated one
+                $(`#cell-${row}-${col}`).replaceWith(response);
+            },
+            error: function () {
+                // Show an error message if the request fails
+                alert("Error updating the cell!");
+            }
+        });
+    }
+
+    // Timer Functionality
+    // Tracks how long the player has been playing
+    let startTime = Date.now(); // Record the start time
+
+    setInterval(function () {
+        // Calculate the elapsed time in minutes and seconds
+        let elapsedTime = Date.now() - startTime;
+        let minutes = Math.floor(elapsedTime / 60000); // Convert milliseconds to minutes
+        let seconds = Math.floor((elapsedTime % 60000) / 1000); // Remaining seconds
+
+        // Format the timer display as MM:SS
+        document.getElementById('timer').innerText =
+            (minutes < 10 ? '0' : '') + minutes + ':' +
+            (seconds < 10 ? '0' : '') + seconds;
+    }, 1000); // Update every second
+</script>

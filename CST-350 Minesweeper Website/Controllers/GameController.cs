@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using CST_350_Minesweeper_Website.Models;
 
 public class GameController : Controller
 {
@@ -68,4 +69,20 @@ public class GameController : Controller
         // Return content as JSON data for client-side processing
         return Json(new { content });
     }
+
+    // ADD THIS: Updates a specific cell and returns the partial view for that cell
+    public IActionResult UpdateCell(int row, int col)
+    {
+        // Simulate fetching the cell from your game's logic or state
+        var cell = new CellModel(row, col)
+        {
+            IsRevealed = true, // Example: Mark the cell as revealed
+            IsLive = false,    // Example: Assume it's not a mine
+            LiveNeighbors = 2  // Example: Assume it has 2 neighboring mines
+        };
+
+        // Return the partial view with the cell model
+        return PartialView("_CellPartial", cell);
+    }
+
 }
