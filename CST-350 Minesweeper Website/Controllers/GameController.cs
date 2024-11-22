@@ -231,4 +231,21 @@ public class GameController : Controller
         HttpContext.Session.SetString("Board", boardJson);
     }
     // --------------------------------------------- END OF SAVE BOARD METHOD ------------------------------------------- //
+
+    // --------------------------------------------- UpdateCell ----------------------------------------------- //
+    public IActionResult UpdateCell(int row, int col)
+    {
+        // Fetch the current board from the session
+        Board board = GetBoard();
+
+        // Update the clicked cell
+        board.Grid[row, col].IsRevealed = true;
+        SaveBoard(board);
+
+        // Return the updated cell as a partial view
+        return PartialView("_CellPartial", board.Grid[row, col]);
+    }
+    // --------------------------------------------- END UpdateCell ------------------------------------------- //
+
+
 }

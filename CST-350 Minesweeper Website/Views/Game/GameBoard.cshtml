@@ -1,0 +1,48 @@
+﻿
+@model CST_350_Minesweeper_Website.Models.BoardModel
+
+<h1>Game Board</h1>
+
+<!-- Timer -->
+<div id="timer">00:00</div>
+
+<!-- Game Board -->
+<div id="game-board">
+    @for (int row = 0; row < Model.Size; row++) 
+    {
+        <div class="row">
+            @for (int col = 0; col < Model.Size; col++) 
+            {
+                @Html.Partial("_CellPartial", Model.Grid[row, col]) <!-- Render each cell -->
+            }
+        </div>
+    }
+</div>
+
+<!-- JavaScript for Timer and AJAX -->
+<script>
+    // Timer functionality
+    let startTime = Date.now();
+    setInterval(function () {
+        let elapsedTime = Date.now() - startTime;
+        let minutes = Math.floor(elapsedTime / 60000);
+        let seconds = Math.floor((elapsedTime % 60000) / 1000);
+        document.getElementById('timer').innerText = 
+            `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, 1000);
+
+    // Handles AJAX cell click
+    function cellClick(row, col) {
+        $.ajax({
+            url: '/Game/UpdateCell',
+            type: 'GET',
+            data: { row: row, col: col },
+            success: function (response) {
+                $(`#cell-${row}-${col}`).replaceWith(response);
+            },
+            error: function () {
+                alert('Error updating cell!');
+            }
+        });
+    }
+</script>
