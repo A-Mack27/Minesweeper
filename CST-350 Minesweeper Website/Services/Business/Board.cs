@@ -1,4 +1,5 @@
 ﻿namespace CST_350_Minesweeper_Website.Services.Business
+
 {
     public class Board
     {

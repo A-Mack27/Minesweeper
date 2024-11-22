@@ -1,46 +1,54 @@
-﻿
-@model CST_350_Minesweeper_Website.Models.BoardModel
+﻿@model CST_350_Minesweeper_Website.Models.BoardModel
 
 <h1>Game Board</h1>
 
-<!-- Timer -->
+<!-- Timer to track player's elapsed time -->
 <div id="timer">00:00</div>
 
-<!-- Game Board -->
+<!-- Game Board rendering -->
 <div id="game-board">
-    @for (int row = 0; row < Model.Size; row++) 
+    @for (int row = 0; row < Model.Size; row++)
     {
         <div class="row">
-            @for (int col = 0; col < Model.Size; col++) 
+            <!-- Render a new row for each iteration -->
+            @for (int col = 0; col < Model.Size; col++)
             {
-                @Html.Partial("_CellPartial", Model.Grid[row, col]) <!-- Render each cell -->
+                <!-- Render each cell using the _CellPartial view -->
+                @Html.Partial("_CellPartial", Model.Grid[row, col])
             }
         </div>
     }
 </div>
 
-<!-- JavaScript for Timer and AJAX -->
+<!-- JavaScript for Timer and AJAX functionality -->
 <script>
-    // Timer functionality
-    let startTime = Date.now();
+    // Timer functionality to display elapsed time
+    let startTime = Date.now(); // Record the time when the game starts
     setInterval(function () {
+        // Calculate elapsed time
         let elapsedTime = Date.now() - startTime;
+
+        // Convert elapsed time to minutes and seconds
         let minutes = Math.floor(elapsedTime / 60000);
         let seconds = Math.floor((elapsedTime % 60000) / 1000);
-        document.getElementById('timer').innerText = 
-            `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    }, 1000);
 
-    // Handles AJAX cell click
+        // Update the timer display in MM:SS format
+        document.getElementById('timer').innerText =
+            `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, 1000); // Update every second
+
+    // Function to handle cell clicks via AJAX
     function cellClick(row, col) {
         $.ajax({
-            url: '/Game/UpdateCell',
-            type: 'GET',
-            data: { row: row, col: col },
+            url: '/Game/UpdateCell', // URL endpoint for cell update
+            type: 'GET', // Use a GET request
+            data: { row: row, col: col }, // Send row and column as data
             success: function (response) {
+                // Replace the clicked cell with the updated partial view
                 $(`#cell-${row}-${col}`).replaceWith(response);
             },
             error: function () {
+                // Handle errors (e.g., network issues)
                 alert('Error updating cell!');
             }
         });
