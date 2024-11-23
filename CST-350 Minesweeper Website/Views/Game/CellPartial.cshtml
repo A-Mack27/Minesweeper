@@ -1,26 +1,25 @@
 ﻿@model CST_350_Minesweeper_Website.Services.Business.Cell
 
-<!-- Partial view for a single Minesweeper cell -->
-<button id="cell-@Model.RowNumber-@Model.ColumnNumber"  <!-- Unique ID for the cell -->
-    class="cell-button"  <!-- Styling class for the cell -->
-    onclick="cellClick(@Model.RowNumber, @Model.ColumnNumber)"> <!-- JavaScript click handler -->
+<button id="cell-@Model.RowNumber-@Model.ColumnNumber"
+        class="cell-button"
+        onclick="cellClick(@Model.RowNumber, @Model.ColumnNumber)">
     @if (Model.IsRevealed)
     {
         @if (Model.IsLive)
         {
-                    <span>💣</span> <!-- Display bomb if the cell is live -->
+            <span>💣</span> <!-- Display bomb -->
         }
         else
         {
-            @Model.LiveNeighbors <!-- Display the number of neighboring mines -->
+            @Model.LiveNeighbors <!-- Display neighboring bomb count -->
         }
     }
     else if (Model.IsFlagged)
     {
-            <span>🚩</span> <!-- Display flag if the cell is flagged -->
+        <span>🚩</span> <!-- Display flag -->
     }
     else
     {
-            <span>?</span> <!-- Placeholder for unrevealed cells -->
+        <span>?</span> <!-- Placeholder for unrevealed cells -->
     }
 </button>

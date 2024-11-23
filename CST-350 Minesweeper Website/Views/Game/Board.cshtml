@@ -20,12 +20,13 @@
 	}
 </style>
 
+<!-- Timer to track player progress -->
+<div id="timer">00:00</div>
 
 @* Surround the entire board as a form that can be submitted *@
 <form style="background-color: @Context.Session.GetString("FormColor");" method="post">
 	<div class="button-zone">
 		@* Iterate over the buttons and display them *@
-
 		@for (int i = 0; i < Model.Size; i++)
 		{
 			for (int j = 0; j < Model.Size; j++)
@@ -55,7 +56,6 @@
 						@if (cell.IsFlagged)
 						{
 							<img src="~/images/Flag.png" alt="Flagged" />
-
 						}
 						else if (cell.IsRevealed && (cell.LiveNeighbors > 0))
 						{
@@ -70,3 +70,15 @@
 		}
 	</div>
 </form>
+
+<!-- JavaScript for Timer -->
+<script>
+	let startTime = Date.now();
+	setInterval(() => {
+		let elapsedTime = Date.now() - startTime;
+		let minutes = Math.floor(elapsedTime / 60000);
+		let seconds = Math.floor((elapsedTime % 60000) / 1000);
+		document.getElementById('timer').innerText = 
+			`${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+	}, 1000);
+</script>
