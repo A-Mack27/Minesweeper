@@ -1,84 +1,49 @@
-﻿@{
-	string buttonSize = "";
-	string buttonColor = "";
-	switch (Model.Size)
-	{
-		case 10: buttonSize = "70px"; break;
-		case 15: buttonSize = "50px"; break;
-		case 20: buttonSize = "40px"; break;
-	}
-}
+﻿@model CST_350_Minesweeper_Website.Services.Business.Board
 
-<style>
-	.cell-class
-	{
-		border: none;
-		padding: 0;
-		margin: 0;
-		width: @buttonSize;
-		height: @buttonSize;
-	}
-</style>
+<h1>Game Board</h1>
 
-<!-- Timer to track player progress -->
+<!-- Timer to track player's elapsed time -->
 <div id="timer">00:00</div>
 
-@* Surround the entire board as a form that can be submitted *@
-<form style="background-color: @Context.Session.GetString("FormColor");" method="post">
-	<div class="button-zone">
-		@* Iterate over the buttons and display them *@
-		@for (int i = 0; i < Model.Size; i++)
-		{
-			for (int j = 0; j < Model.Size; j++)
-			{
-				var cell = Model.Grid[i, j];
-				// Determine the color of the cell
-				if (cell.IsFlagged)
-				{
-					buttonColor = "tomato";
-				}
-				else if ((i + j) % 2 == 0)
-				{
-					if (cell.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor1");
-					else buttonColor = Context.Session.GetString("UnvisitedColor1");
-				}
-				else
-				{
-					if (cell.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor2");
-					else buttonColor = Context.Session.GetString("UnvisitedColor2");
-				}
-				// Create the button
-				<button class="cell-class" type="submit"
-						style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor")"
-						name="cellLocation" value="@i,@j"
-						asp-controller="Game" asp-action="RevealCell">
-					<div class="button-label">
-						@if (cell.IsFlagged)
-						{
-							<img src="~/images/Flag.png" alt="Flagged" />
-						}
-						else if (cell.IsRevealed && (cell.LiveNeighbors > 0))
-						{
-							// Display the live neighbor count
-							@cell.LiveNeighbors
-						}
-					</div>
-				</button>
-			}
-			// Add a break
-			<div class="line-break"></div>
-		}
-	</div>
-</form>
+<!-- Game Board Rendering -->
+<div id="game-board">
+    @for (int i = 0; i < Model.Size; i++)
+    {
+        <div class="row">
+            <!-- Render each cell using the _CellPartial view -->
+            @for (int j = 0; j < Model.Size; j++)
+            {
+                @Html.Partial("_CellPartial", Model.Grid[i, j])
+            }
+        </div>
+    }
+</div>
 
-<!-- JavaScript for Timer -->
+<!-- JavaScript for Timer and AJAX Functionality -->
 <script>
-	let startTime = Date.now();
-	setInterval(() => {
-		let elapsedTime = Date.now() - startTime;
-		let minutes = Math.floor(elapsedTime / 60000);
-		let seconds = Math.floor((elapsedTime % 60000) / 1000);
-		document.getElementById('timer').innerText = 
-			`${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-	}, 1000);
+    // Timer functionality to display elapsed time
+    let startTime = Date.now();
+    setInterval(function () {
+        let elapsedTime = Date.now() - startTime;
+        let minutes = Math.floor(elapsedTime / 60000);
+        let seconds = Math.floor((elapsedTime % 60000) / 1000);
+        document.getElementById('timer').innerText =
+            `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, 1000);
+
+    // Function to handle cell clicks via AJAX
+    function cellClick(row, col) {
+        $.ajax({
+            url: '/Game/UpdateCell',
+            type: 'POST',
+            data: { row: row, col: col },
+            success: function (response) {
+                // Update the clicked cell with the returned partial view
+                $(`#cell-${row}-${col}`).replaceWith(response);
+            },
+            error: function () {
+                alert('Error updating cell!');
+            }
+        });
+    }
 </script>
