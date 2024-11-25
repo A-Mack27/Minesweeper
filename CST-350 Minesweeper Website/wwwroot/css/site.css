@@ -1,49 +1,109 @@
+/* General styles for the Minesweeper website */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 /* ------------------------------- */
-/*  Styles for Button Grid Layout  */
+/*  Styles for the Minesweeper Grid */
 /* ------------------------------- */
-.button-zone 
-{
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 70px);
+    grid-gap: 5px; /* Space between cells */
+    justify-content: center;
+    align-content: center;
+    margin: 20px auto; /* Center the grid */
+    width: fit-content;
+}
+
+.grid-item {
     display: flex;
-    flex-wrap: wrap;
-}
-.line-break 
-{
-    flex-basis: 100%;
-    height: 0;
-}
-.button-label 
-{
+    justify-content: center;
+    align-items: center;
+    background-color: #e0e0e0; /* Default cell background */
+    border: 1px solid #000; /* Cell border for grid visibility */
     font-size: 18px;
-    text-align: center;
-    font-family: "Cascadia Mono", monospace;
+    width: 70px; /* Cell width */
+    height: 70px; /* Cell height */
+    cursor: pointer; /* Add pointer for click interaction */
+}
+
+    .grid-item:hover {
+        background-color: #d6d6d6; /* Highlight cell on hover */
+    }
+
+/* Styling for revealed cells */
+.revealed {
+    background-color: #ffffff; /* White background for revealed cells */
+    border: 1px solid #cccccc; /* Light gray border for revealed cells */
+    color: black; /* Default text color */
+}
+
+/* Styling for bombs */
+.bomb {
+    color: red; /* Red color for bombs */
+    font-size: 24px;
     font-weight: bold;
 }
-.button-label img 
-{
-    max-width: 90%; /* Ensure the image fills the button container */
-    max-height: 90%; /* Ensure the image doesn’t overflow vertically */
-    object-fit: contain; /* Keep aspect ratio and scale image to fit within the box */
+
+/* Styling for flags */
+.flag {
+    color: green; /* Green color for flags */
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Styling for cells with live neighbors */
+.live-neighbors {
+    color: blue; /* Blue text for live neighbor counts */
+    font-weight: bold;
+}
+
+/* Timer styles */
+#timer {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 20px;
+    text-align: center;
+}
+
+/* Responsive adjustments for different screen sizes */
+@media (max-width: 768px) {
+    .grid-item {
+        width: 50px;
+        height: 50px;
+    }
+
+    .bomb, .flag, .live-neighbors {
+        font-size: 20px;
+    }
+
+    .cell-image {
+        max-width: 100%; /* Adjust width to fit inside the button */
+        max-height: 100%; /* Adjust height to fit inside the button */
+        object-fit: contain; /* Maintain aspect ratio */
+    }
 }

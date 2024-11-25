@@ -9,13 +9,10 @@
 <div id="game-board">
     @for (int i = 0; i < Model.Size; i++)
     {
-        <div class="row">
-            <!-- Render each cell using the _CellPartial view -->
-            @for (int j = 0; j < Model.Size; j++)
-            {
-                @Html.Partial("_CellPartial", Model.Grid[i, j])
-            }
-        </div>
+        @for (int j = 0; j < Model.Size; j++)
+        {
+            @Html.Partial("_CellPartial", Model.Grid[i, j])
+        }
     }
 </div>
 
@@ -47,3 +44,42 @@
         });
     }
 </script>
+
+<style>
+    /* Grid styling for the game board */
+    #game-board {
+        display: grid;
+        grid-template-columns: repeat(@Model.Size, 70px); /* Set grid size dynamically */
+        grid-gap: 5px;
+        margin: 20px auto;
+        width: fit-content;
+    }
+
+    .cell-button {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #e0e0e0;
+        border: 1px solid #000;
+        cursor: pointer;
+        font-size: 18px;
+        font-family: "Cascadia Mono", monospace;
+        font-weight: bold;
+    }
+
+    .cell-button img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+    }
+
+    /* Timer styling */
+    #timer {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+</style>

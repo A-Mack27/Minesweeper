@@ -1,23 +1,26 @@
 ﻿@model CST_350_Minesweeper_Website.Services.Business.Cell
 
-<!-- Partial view for a single Minesweeper cell -->
 <button id="cell-@Model.RowNumber-@Model.ColumnNumber"
-        class="cell-button"
+        class="grid-item"
         onclick="cellClick(@Model.RowNumber, @Model.ColumnNumber)">
     @if (Model.IsRevealed)
     {
         @if (Model.IsLive)
         {
-            <span>💣</span> <!-- Display bomb -->
+            <span class="bomb">💣</span> <!-- Display bomb -->
+        }
+        else if (Model.LiveNeighbors > 0)
+        {
+            <span class="neighbor">@Model.LiveNeighbors</span> <!-- Display neighboring bomb count -->
         }
         else
         {
-            @Model.LiveNeighbors <!-- Display neighboring bomb count -->
+            <span class="empty-cell">&nbsp;</span> <!-- Display empty cell -->
         }
     }
     else if (Model.IsFlagged)
     {
-        <span>🚩</span> <!-- Display flag -->
+        <span class="flag">🚩</span> <!-- Display flag -->
     }
     else
     {

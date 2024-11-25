@@ -5,191 +5,179 @@ using CST_350_Minesweeper_Website.Services.Business;
 
 public class GameController : Controller
 {
-	private static bool gameStarted;
-	private static bool gameIsOver;
-	private static int cellsLeft;
-	private static int bombCount;
+    private static bool gameStarted;
+    private static bool gameIsOver;
+    private static int cellsLeft;
+    private static int bombCount;
 
-	// ------------------------------------------------- INDEX VIEW -------------------------------------------------- //
-	/// <summary>
-	/// Index view of the game controller
-	/// </summary>
-	/// <returns></returns>
-	public IActionResult Index()
-	{
-		// Check if the user session is active
-		if (HttpContext.Session.GetString("User") == null)
-		{
-			// If the user isn't logged in, redirect them to the login page
-			return RedirectToAction("Index", "Login");
-		}
-		return View();
-	}
-	// ---------------------------------------------- END OF INDEX VIEW ---------------------------------------------- //
+    // ------------------------------------------------- INDEX VIEW -------------------------------------------------- //
+    public IActionResult Index()
+    {
+        if (HttpContext.Session.GetString("User") == null)
+        {
+            return RedirectToAction("Index", "Login");
+        }
+        return View();
+    }
+    // ---------------------------------------------- END OF INDEX VIEW ---------------------------------------------- //
 
-	// ------------------------------------------------- BOARD VIEW -------------------------------------------------- //
-	/// <summary>
-	/// Action to show the board
-	/// </summary>
-	/// <returns></returns>
-	public IActionResult Board()
-	{
-		// Retrieve the board and pass it to the Board view
-		return View("Board", GetBoard());
-	}
-	// ---------------------------------------------- END OF BOARD VIEW ---------------------------------------------- //
+    // ------------------------------------------------- BOARD VIEW -------------------------------------------------- //
+    public IActionResult Board()
+    {
+        return View("Board", GetBoard());
+    }
+    // ---------------------------------------------- END OF BOARD VIEW ---------------------------------------------- //
 
-	// ------------------------------------------------ RESUME ACTION ------------------------------------------------ //
-	/// <summary>
-	/// Action to handle the resume button
-	/// </summary>
-	/// <returns></returns>
-	public IActionResult Resume()
-	{
-		if (HttpContext.Session.GetString("Board") != null)
-		{
-			return RedirectToAction("Index", "Theme");
-		}
-		return RedirectToAction("Board", "Game");
-	}
-	// --------------------------------------------- END OF RESUME ACTION -------------------------------------------- //
+    // ------------------------------------------------ RESUME ACTION ------------------------------------------------ //
+    public IActionResult Resume()
+    {
+        if (HttpContext.Session.GetString("Board") != null)
+        {
+            return RedirectToAction("Index", "Theme");
+        }
+        return RedirectToAction("Board", "Game");
+    }
+    // --------------------------------------------- END OF RESUME ACTION -------------------------------------------- //
 
-	// ------------------------------------------------- START ACTION ------------------------------------------------ //
-	/// <summary>
-	/// Action to start the game
-	/// </summary>
-	/// <param name="boardSize"></param>
-	/// <param name="difficulty"></param>
-	/// <returns></returns>
-	[HttpPost]
-	public IActionResult Initialize(string boardSize, string difficulty)
-	{
-		// Convert the board size string to an int
-		int boardSizeInt = 0;
-		switch (boardSize)
-		{
-			case "small": boardSizeInt = 10; break;
-			case "medium": boardSizeInt = 15; break;
-			case "large": boardSizeInt = 20; break;
-		}
-		// Convert the board difficulty to an int
-		int difficultyInt = 0;
-		switch (difficulty)
-		{
-			case "easy": difficultyInt = 10; break;
-			case "medium": difficultyInt = 15; break;
-			case "hard": difficultyInt = 20; break;
-		}
-		// Create the board
-		Board board = new Board(boardSizeInt, difficultyInt);
-		gameStarted = false; gameIsOver = false;
-		HttpContext.Session.SetString("GameStarted", "false");
-		HttpContext.Session.SetString("StartTime", DateTime.Now.ToString()); // Start time for the timer
-		SaveBoard(board);
-		return RedirectToAction("Board");
-	}
-	// ---------------------------------------------- END OF START ACTION -------------------------------------------- //
+    // ------------------------------------------------- START ACTION ------------------------------------------------ //
+    [HttpPost]
+    public IActionResult Initialize(string boardSize, string difficulty)
+    {
+        int boardSizeInt = 0;
+        switch (boardSize)
+        {
+            case "small": boardSizeInt = 10; break;
+            case "medium": boardSizeInt = 15; break;
+            case "large": boardSizeInt = 20; break;
+        }
 
-	// ------------------------------------------------- RESTART ACTION ---------------------------------------------- //
-	/// <summary>
-	/// Action to restart the game and remove the board
-	/// </summary>
-	/// <returns></returns>
-	public IActionResult Start()
-	{
-		HttpContext.Session.Remove("Board");
-		HttpContext.Session.SetString("GameStarted", "false");
-		return RedirectToAction("Index", "Theme");
-	}
-	// ---------------------------------------------- END OF RESTART ACTION ------------------------------------------ //
+        int difficultyInt = 0;
+        switch (difficulty)
+        {
+            case "easy": difficultyInt = 10; break;
+            case "medium": difficultyInt = 15; break;
+            case "hard": difficultyInt = 20; break;
+        }
 
-	public IActionResult Configure()
-	{
-		return View();
-	}
+        Board board = new Board(boardSizeInt, difficultyInt);
+        gameStarted = false; gameIsOver = false;
+        HttpContext.Session.SetString("GameStarted", "false");
+        HttpContext.Session.SetString("StartTime", DateTime.Now.ToString());
+        SaveBoard(board);
 
-	// --------------------------------------------------- WIN VIEW -------------------------------------------------- //
-	public IActionResult Win()
-	{
-		int score = CalculateScore();
-		HttpContext.Session.Remove("Board");
-		return View(score);
-	}
-	// ------------------------------------------------ END OF WIN VIEW ---------------------------------------------- //
+        return RedirectToAction("Board");
+    }
+    // ---------------------------------------------- END OF START ACTION -------------------------------------------- //
 
-	public IActionResult Loss()
-	{
-		return View();
-	}
+    // ------------------------------------------------- RESTART ACTION ---------------------------------------------- //
+    public IActionResult Start()
+    {
+        HttpContext.Session.Remove("Board");
+        HttpContext.Session.SetString("GameStarted", "false");
+        return RedirectToAction("Index", "Theme");
+    }
+    // ---------------------------------------------- END OF RESTART ACTION ------------------------------------------ //
 
-	// -------------------------------------------- CALCULATE SCORE METHOD ------------------------------------------- //
-	private int CalculateScore()
-	{
-		Board board = GetBoard();
-		TimeSpan elapsedTime = DateTime.Now - DateTime.Parse(HttpContext.Session.GetString("StartTime"));
-		int baseScore = 10000;
-		double sizeMulti = (double)board.Size / 10;
-		double diffMulti = (double)board.Difficulty / 10;
-		double score = (baseScore * sizeMulti * diffMulti) / (elapsedTime.TotalSeconds + 1);
-		return (int)score;
-	}
-	// ----------------------------------------- END OF CALCULATE SCORE METHOD --------------------------------------- //
+    public IActionResult Configure()
+    {
+        return View();
+    }
 
-	// ---------------------------------------------- REVEAL CELL ACTION --------------------------------------------- //
-	[HttpPost]
-	public IActionResult RevealCell(string cellLocation)
-	{
-		var parts = cellLocation.Split(',');
-		int row = Convert.ToInt32(parts[0]);
-		int col = Convert.ToInt32(parts[1]);
+    // --------------------------------------------------- WIN VIEW -------------------------------------------------- //
+    public IActionResult Win()
+    {
+        int score = CalculateScore();
+        HttpContext.Session.Remove("Board");
+        return View(score);
+    }
+    // ------------------------------------------------ END OF WIN VIEW ---------------------------------------------- //
 
-		Board board = GetBoard();
+    public IActionResult Loss()
+    {
+        return View();
+    }
 
-		if (!gameStarted)
-		{
-			board.GenerateBombs(row, col);
-			gameStarted = true;
-			HttpContext.Session.SetString("GameStarted", "true");
-		}
+    // -------------------------------------------- CALCULATE SCORE METHOD ------------------------------------------- //
+    private int CalculateScore()
+    {
+        Board board = GetBoard();
+        TimeSpan elapsedTime = DateTime.Now - DateTime.Parse(HttpContext.Session.GetString("StartTime"));
+        int baseScore = 10000;
+        double sizeMulti = (double)board.Size / 10;
+        double diffMulti = (double)board.Difficulty / 10;
+        double score = (baseScore * sizeMulti * diffMulti) / (elapsedTime.TotalSeconds + 1);
+        return (int)score;
+    }
+    // ----------------------------------------- END OF CALCULATE SCORE METHOD --------------------------------------- //
 
-		Cell cell = board.Grid[row, col];
-		(gameIsOver, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
-		SaveBoard(board);
+    // ---------------------------------------------- REVEAL CELL ACTION --------------------------------------------- //
+    [HttpPost]
+    public IActionResult RevealCell(string cellLocation)
+    {
+        var parts = cellLocation.Split(',');
+        int row = Convert.ToInt32(parts[0]);
+        int col = Convert.ToInt32(parts[1]);
 
-		if (gameIsOver)
-		{
-			HttpContext.Session.SetString("GameStarted", "false");
-			return cellsLeft == 0 ? RedirectToAction("Win") : RedirectToAction("Loss");
-		}
-		return PartialView("_CellPartial", cell);
-	}
-	// -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
+        Board board = GetBoard();
 
-	// ------------------------------------------------ GET BOARD METHOD ----------------------------------------------- //
-	private Board GetBoard()
-	{
-		var boardJson = HttpContext.Session.GetString("Board");
-		if (string.IsNullOrEmpty(boardJson)) return null;
-		return JsonConvert.DeserializeObject<Board>(boardJson);
-	}
-	// --------------------------------------------- END OF GET BOARD METHOD -------------------------------------------- //
+        if (!gameStarted)
+        {
+            board.GenerateBombs(row, col);
+            gameStarted = true;
+            HttpContext.Session.SetString("GameStarted", "true");
+        }
 
-	// ------------------------------------------------ SAVE BOARD METHOD ----------------------------------------------- //
-	private void SaveBoard(Board board)
-	{
-		var boardJson = JsonConvert.SerializeObject(board);
-		HttpContext.Session.SetString("Board", boardJson);
-	}
-	// --------------------------------------------- END OF SAVE BOARD METHOD ------------------------------------------- //
+        Cell cell = board.Grid[row, col];
+        if (!cell.IsRevealed && !cell.IsFlagged)
+        {
+            cell.IsRevealed = true; // Reveal the cell
+        }
 
-	// --------------------------------------------- UPDATE CELL AJAX HANDLER ------------------------------------------- //
-	public IActionResult UpdateCell(int row, int col)
-	{
-		Board board = GetBoard();
-		Cell cell = board.Grid[row, col];
-		cell.IsRevealed = true;
-		SaveBoard(board);
-		return PartialView("_CellPartial", cell);
-	}
-	// -------------------------------------------- END OF UPDATE CELL AJAX HANDLER ------------------------------------ //
+        (gameIsOver, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
+        SaveBoard(board);
+
+        if (gameIsOver)
+        {
+            HttpContext.Session.SetString("GameStarted", "false");
+            return cellsLeft == 0 ? RedirectToAction("Win") : RedirectToAction("Loss");
+        }
+
+        return PartialView("_CellPartial", cell); // Return the updated partial view
+    }
+    // -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
+
+    // ------------------------------------------------ GET BOARD METHOD ----------------------------------------------- //
+    private Board GetBoard()
+    {
+        var boardJson = HttpContext.Session.GetString("Board");
+        if (string.IsNullOrEmpty(boardJson)) return null;
+        return JsonConvert.DeserializeObject<Board>(boardJson);
+    }
+    // --------------------------------------------- END OF GET BOARD METHOD -------------------------------------------- //
+
+    // ------------------------------------------------ SAVE BOARD METHOD ----------------------------------------------- //
+    private void SaveBoard(Board board)
+    {
+        var boardJson = JsonConvert.SerializeObject(board);
+        HttpContext.Session.SetString("Board", boardJson);
+    }
+    // --------------------------------------------- END OF SAVE BOARD METHOD ------------------------------------------- //
+
+    // --------------------------------------------- UPDATE CELL AJAX HANDLER ------------------------------------------- //
+    public IActionResult UpdateCell(int row, int col)
+    {
+        Board board = GetBoard();
+        Cell cell = board.Grid[row, col];
+
+        // Ensure cell is updated correctly
+        if (!cell.IsFlagged && !cell.IsRevealed)
+        {
+            cell.IsRevealed = true;
+        }
+
+        SaveBoard(board);
+        return PartialView("_CellPartial", cell);
+    }
+
+    // -------------------------------------------- END OF UPDATE CELL AJAX HANDLER ------------------------------------ //
 }
