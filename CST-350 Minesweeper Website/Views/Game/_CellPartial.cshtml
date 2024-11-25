@@ -1,29 +1,27 @@
 ﻿@model CST_350_Minesweeper_Website.Services.Business.Cell
 
-<button id="cell-@Model.RowNumber-@Model.ColumnNumber"
-        class="grid-item"
-        onclick="cellClick(@Model.RowNumber, @Model.ColumnNumber)">
+<button id="cell-@Model.RowNumber-@Model.ColumnNumber" class="grid-item" onclick="cellClick(@Model.RowNumber, @Model.ColumnNumber)">
     @if (Model.IsRevealed)
     {
         @if (Model.IsLive)
         {
-            <span class="bomb">💣</span> <!-- Display bomb -->
+            <span class="bomb">💣</span>
         }
         else if (Model.LiveNeighbors > 0)
         {
-            <span class="neighbor">@Model.LiveNeighbors</span> <!-- Display neighboring bomb count -->
+            <span class="neighbor">@Model.LiveNeighbors</span>
         }
         else
         {
-            <span class="empty-cell">&nbsp;</span> <!-- Display empty cell -->
+            <span class="empty-cell">&nbsp;</span>
         }
     }
     else if (Model.IsFlagged)
     {
-        <span class="flag">🚩</span> <!-- Display flag -->
+        <span class="flag">🚩</span>
     }
     else
     {
-        <span>?</span> <!-- Placeholder for unrevealed cells -->
+        <span>?</span>
     }
 </button>
