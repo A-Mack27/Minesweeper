@@ -32,78 +32,75 @@ body {
 #game-board {
     display: grid;
     grid-template-columns: repeat(auto-fit, 70px);
-    grid-gap: 5px; /* Space between cells */
-    justify-content: center;
-    align-content: center;
-    margin: 20px auto; /* Center the grid */
+    grid-gap: 5px;
+    margin: 20px auto;
     width: fit-content;
 }
 
+/* Styling for the Game Over and You Win messages */
+.centered-message {
+    display: flex;
+    flex-direction: column; /* Stack content vertically */
+    align-items: center; /* Center horizontally */
+    justify-content: center; /* Center vertically */
+    height: 100vh; /* Full viewport height */
+    text-align: center; /* Center-align text */
+    gap: 10px; /* Space between items */
+    margin: 0 auto; /* Ensure horizontal centering */
+}
+
+    .centered-message h1 {
+        font-size: 32px; /* Larger heading text */
+        margin-bottom: 10px;
+    }
+
+    .centered-message p {
+        font-size: 18px; /* Adjust paragraph size */
+        margin-bottom: 20px;
+    }
+
+    .centered-message button {
+        padding: 10px 20px; /* Button padding */
+        font-size: 16px; /* Button font size */
+    }
+
+/* Styling for individual grid cells */
 .grid-item {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #e0e0e0; /* Default cell background */
-    border: 1px solid #000; /* Cell border for grid visibility */
+    background-color: #e0e0e0;
+    border: 1px solid #000;
     font-size: 18px;
-    width: 70px; /* Cell width */
-    height: 70px; /* Cell height */
-    cursor: pointer; /* Add pointer for click interaction */
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
 }
 
     .grid-item:hover {
-        background-color: #d6d6d6; /* Highlight cell on hover */
+        background-color: #d6d6d6;
     }
-
-/* Styling for revealed cells */
-.revealed {
-    background-color: #ffffff; /* White background for revealed cells */
-    border: 1px solid #cccccc; /* Light gray border for revealed cells */
-    color: black; /* Default text color */
-}
 
 /* Styling for bombs */
 .bomb {
-    color: red; /* Red color for bombs */
-    font-size: 24px;
-    font-weight: bold;
+    color: red;
 }
 
 /* Styling for flags */
 .flag {
-    color: green; /* Green color for flags */
-    font-size: 24px;
+    color: green;
+}
+
+/* Styling for live neighbors */
+.neighbor {
+    color: blue;
     font-weight: bold;
 }
 
-/* Styling for cells with live neighbors */
-.live-neighbors {
-    color: blue; /* Blue text for live neighbor counts */
-    font-weight: bold;
-}
-
-/* Timer styles */
+/* Timer styling */
 #timer {
     font-size: 24px;
     font-weight: bold;
-    margin: 20px;
     text-align: center;
-}
-
-/* Responsive adjustments for different screen sizes */
-@media (max-width: 768px) {
-    .grid-item {
-        width: 50px;
-        height: 50px;
-    }
-
-    .bomb, .flag, .live-neighbors {
-        font-size: 20px;
-    }
-
-    .cell-image {
-        max-width: 100%; /* Adjust width to fit inside the button */
-        max-height: 100%; /* Adjust height to fit inside the button */
-        object-fit: contain; /* Maintain aspect ratio */
-    }
+    margin-bottom: 10px;
 }

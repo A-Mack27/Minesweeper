@@ -1,10 +1,15 @@
 ﻿@{
-    ViewData["Title"] = "Game Over";
+    ViewData["Title"] = "Game Over"; // Set the page title to "Game Over"
 }
 
-<h1>Game Over</h1>
-<p>Better luck next time!</p>
-<br />
-<form method="post">
-    <button class="btn btn-primary" type="submit" asp-controller="Game" asp-action="Index">Try again</button>
-</form>
+<!-- Center the "Game Over" message and its content -->
+<div class="centered-message">
+    <h1>Game Over</h1> <!-- Display the main heading for the Game Over page -->
+    <p>Better luck next time!</p> <!-- Display a supportive message for the player -->
+    <br />
+    <form method="post">
+        <!-- Form for restarting the game -->
+        <!-- Button to redirect the player back to the game start -->
+        <button class="btn btn-primary" type="submit" asp-controller="Game" asp-action="Index">Try again</button>
+    </form>
+</div>

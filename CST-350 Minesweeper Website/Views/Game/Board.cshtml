@@ -11,7 +11,9 @@
     {
         @for (int j = 0; j < Model.Size; j++)
         {
-            @Html.Partial("_CellPartial", Model.Grid[i, j])
+            <div id="cell-@i-@j" class="grid-item" onclick="cellClick(@i, @j)" oncontextmenu="flagCell(@i, @j); return false;">
+                @Html.Partial("_CellPartial", Model.Grid[i, j])
+            </div>
         }
     }
 </div>
@@ -31,15 +33,31 @@
     // Function to handle cell clicks via AJAX
     function cellClick(row, col) {
         $.ajax({
-            url: '/Game/UpdateCell',
+            url: '/Game/RevealCell',
             type: 'POST',
-            data: { row: row, col: col },
+            data: { cellLocation: `${row},${col}` },
             success: function (response) {
                 // Update the clicked cell with the returned partial view
                 $(`#cell-${row}-${col}`).replaceWith(response);
             },
             error: function () {
                 alert('Error updating cell!');
+            }
+        });
+    }
+
+    // Function to handle right-click (flagging cells)
+    function flagCell(row, col) {
+        $.ajax({
+            url: '/Game/ToggleFlag',
+            type: 'POST',
+            data: { row: row, col: col },
+            success: function (response) {
+                // Update the flagged cell with the returned partial view
+                $(`#cell-${row}-${col}`).replaceWith(response);
+            },
+            error: function () {
+                alert('Error toggling flag!');
             }
         });
     }
@@ -55,24 +73,20 @@
         width: fit-content;
     }
 
-    .cell-button {
-        width: 70px;
-        height: 70px;
+    .grid-item {
         display: flex;
         justify-content: center;
         align-items: center;
         background-color: #e0e0e0;
         border: 1px solid #000;
-        cursor: pointer;
         font-size: 18px;
-        font-family: "Cascadia Mono", monospace;
-        font-weight: bold;
+        width: 70px; /* Cell width */
+        height: 70px; /* Cell height */
+        cursor: pointer; /* Add pointer for click interaction */
     }
 
-    .cell-button img {
-        max-width: 90%;
-        max-height: 90%;
-        object-fit: contain;
+    .grid-item:hover {
+        background-color: #d6d6d6; /* Highlight cell on hover */
     }
 
     /* Timer styling */
@@ -81,5 +95,32 @@
         font-weight: bold;
         text-align: center;
         margin-bottom: 10px;
+    }
+
+    /* Styling for revealed cells */
+    .revealed {
+        background-color: #ffffff; /* White background for revealed cells */
+        border: 1px solid #cccccc; /* Light gray border for revealed cells */
+        color: black; /* Default text color */
+    }
+
+    /* Styling for bombs */
+    .bomb {
+        color: red; /* Red color for bombs */
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    /* Styling for flags */
+    .flag {
+        color: green; /* Green color for flags */
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    /* Styling for cells with live neighbors */
+    .neighbor {
+        color: blue; /* Blue text for live neighbor counts */
+        font-weight: bold;
     }
 </style>
