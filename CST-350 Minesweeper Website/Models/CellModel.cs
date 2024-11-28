@@ -1,6 +1,6 @@
-﻿namespace CST_350_Minesweeper_Website.Services.Business
+﻿namespace CST_350_Minesweeper_Website.Models
 {
-    public class Cell
+    public class CellModel
     {
         // Getters and setters for attributes
         public int RowNumber { get; set; }
@@ -11,7 +11,7 @@
         public bool IsFlagged { get; set; }
 
         // Constructor
-        public Cell(int r, int c)
+        public CellModel(int r, int c)
         {
             RowNumber = r;
             ColumnNumber = c;

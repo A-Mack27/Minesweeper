@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using CST_350_Minesweeper_Website.Services.Business;
+using CST_350_Minesweeper_Website.Models;
 
 public class GameController : Controller
 {
@@ -32,10 +33,10 @@ public class GameController : Controller
 	/// Action to show the board
 	/// </summary>
 	/// <returns></returns>
-	public IActionResult Board()
+	public IActionResult Play()
 	{
 		// Retrieve the board and pass it to the Board view
-		return View("Board", GetBoard());
+		return View("Play", GetBoard());
 	}
 	// ---------------------------------------------- END OF BOARD VIEW ---------------------------------------------- //
 
@@ -50,7 +51,7 @@ public class GameController : Controller
 		{
 			return RedirectToAction("Index", "Theme");
 		}
-		return RedirectToAction("Board", "Game");
+		return RedirectToAction("Play", "Game");
 	}
 	// --------------------------------------------- END OF RESUME ACTION -------------------------------------------- //
 
@@ -66,12 +67,13 @@ public class GameController : Controller
 	{
 		// Convert the board size string to an int
 		int boardSizeInt = 0;
+		string cellSize = "";
 		switch (boardSize)
 		{
-			case "small": boardSizeInt = 10; break;
-			case "medium": boardSizeInt = 15; break;
-			case "large": boardSizeInt = 20; break;
-		}
+			case "small": boardSizeInt = 10; cellSize = "70px"; break;
+			case "medium": boardSizeInt = 15; cellSize = "50px"; break;
+			case "large": boardSizeInt = 20; cellSize = "40px"; break;
+        }
 		// Convert the board difficulty to an int
 		int difficultyInt = 0;
 		switch (difficulty)
@@ -84,9 +86,10 @@ public class GameController : Controller
 		Board board = new Board(boardSizeInt, difficultyInt);
 		gameStarted = false; gameIsOver = false;
 		HttpContext.Session.SetString("GameStarted", "false");
+		HttpContext.Session.SetString("CellSize", cellSize);
 		HttpContext.Session.SetString("StartTime", DateTime.Now.ToString()); // Start time for the timer
 		SaveBoard(board);
-		return RedirectToAction("Board");
+		return RedirectToAction("Play");
 	}
 	// ---------------------------------------------- END OF START ACTION -------------------------------------------- //
 
@@ -137,35 +140,38 @@ public class GameController : Controller
 
 	// ---------------------------------------------- REVEAL CELL ACTION --------------------------------------------- //
 	[HttpPost]
-	public IActionResult RevealCell(string cellLocation)
-	{
-		var parts = cellLocation.Split(',');
-		int row = Convert.ToInt32(parts[0]);
-		int col = Convert.ToInt32(parts[1]);
+    public IActionResult RevealCell(string cellLocation)
+    {
+        var parts = cellLocation.Split(',');
+        int row = Convert.ToInt32(parts[0]);
+        int col = Convert.ToInt32(parts[1]);
 
-		Board board = GetBoard();
+		bool floodFillActivated;
 
-		if (!gameStarted)
-		{
-			board.GenerateBombs(row, col);
-			gameStarted = true;
-			HttpContext.Session.SetString("GameStarted", "true");
-		}
+        Board board = GetBoard();
 
-		Cell cell = board.Grid[row, col];
-		(gameIsOver, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
-		SaveBoard(board);
+        if (!gameStarted)
+        {
+            board.GenerateBombs(row, col);
+            gameStarted = true;
+            HttpContext.Session.SetString("GameStarted", "true");
+        }
 
-		if (gameIsOver)
-		{
-			HttpContext.Session.SetString("GameStarted", "false");
-			return cellsLeft == 0 ? RedirectToAction("Win") : RedirectToAction("Loss");
-		}
-		return PartialView("_CellPartial", cell);
-	}
-	// -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
+        CellModel cell = board.Grid[row, col];
+        (gameIsOver, floodFillActivated, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
+        SaveBoard(board);
 
-	// ------------------------------------------------ GET BOARD METHOD ----------------------------------------------- //
+        if (gameIsOver)
+        {
+            HttpContext.Session.SetString("GameStarted", "false");
+            return cellsLeft == 0 ? RedirectToAction("Win") : RedirectToAction("Loss");
+        }
+		if (floodFillActivated) return RedirectToAction("Play", GetBoard());
+        return PartialView("_CellPartial", cell); // Return the updated cell as partial view
+    }
+// -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
+
+// ------------------------------------------------ GET BOARD METHOD ----------------------------------------------- //
 	private Board GetBoard()
 	{
 		var boardJson = HttpContext.Session.GetString("Board");
@@ -186,7 +192,7 @@ public class GameController : Controller
 	public IActionResult UpdateCell(int row, int col)
 	{
 		Board board = GetBoard();
-		Cell cell = board.Grid[row, col];
+		CellModel cell = board.Grid[row, col];
 		cell.IsRevealed = true;
 		SaveBoard(board);
 		return PartialView("_CellPartial", cell);

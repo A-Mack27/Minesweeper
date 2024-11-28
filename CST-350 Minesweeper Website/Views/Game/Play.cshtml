@@ -1,0 +1,23 @@
+﻿@model CST_350_Minesweeper_Website.Services.Business.Board
+
+<h1>Play</h1>
+
+<!-- Timer to track player's elapsed time -->
+<div id="timer">00:00</div>
+
+<div>
+    @Html.Partial("_BoardPartial", Model);
+</div>
+
+<!-- JavaScript for Timer and AJAX Functionality -->
+<script>
+    // Timer functionality to display elapsed time
+    let startTime = Date.now();
+    setInterval(function () {
+        let elapsedTime = Date.now() - startTime;
+        let minutes = Math.floor(elapsedTime / 60000);
+        let seconds = Math.floor((elapsedTime % 60000) / 1000);
+        document.getElementById('timer').innerText =
+            `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, 1000);
+</script>

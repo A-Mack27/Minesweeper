@@ -1,11 +1,13 @@
-﻿namespace CST_350_Minesweeper_Website.Services.Business
+﻿using CST_350_Minesweeper_Website.Models;
+
+namespace CST_350_Minesweeper_Website.Services.Business
 {
-	public class Board
+    public class Board
 	{
 		// Square board
 		public int Size { get; set; }
 		// Array of cell objects
-		public Cell[,] Grid { get; set; }
+		public CellModel[,] Grid { get; set; }
 		public decimal Difficulty { get; set; }
 		public int InitialBombCount { get; set; }
 
@@ -18,13 +20,13 @@
 		{
 			Difficulty = d;
 			Size = s;
-			Grid = new Cell[Size, Size];
+			Grid = new CellModel[Size, Size];
 			// Fill the grid with Cell objects
 			for (int i = 0; i < Size; i++)
 			{
 				for (int j = 0; j < Size; j++)
 				{
-					Grid[i, j] = new Cell(i, j);
+					Grid[i, j] = new CellModel(i, j);
 				}
 			}
 		}
@@ -39,7 +41,7 @@
 		{
 			// Instantiate Random class
 			Random rand = new Random();
-			Cell startCell = Grid[startRow, startCol];
+			CellModel startCell = Grid[startRow, startCol];
 			// Calculate the total number of bombs necessary
 			int bombCount = decimal.ToInt32(Convert.ToDecimal(Size) * Convert.ToDecimal(Size) * (Difficulty / 100));
 			InitialBombCount = bombCount;
@@ -49,7 +51,7 @@
 				// Generate random numbers for row and column
 				int row = rand.Next(0, Size);
 				int col = rand.Next(0, Size);
-				Cell randCell = Grid[row, col];
+				CellModel randCell = Grid[row, col];
 
 				// The second condition is here to prevent a loss right after the first cell is chosen
 				if (randCell.IsLive != true && !randCell.Equals(startCell))
@@ -64,7 +66,7 @@
 			if (startCell.LiveNeighbors > 0)
 			{
 				// Reset all the cells
-				foreach (Cell cell in Grid)
+				foreach (CellModel cell in Grid)
 				{
 					cell.IsLive = false;
 					cell.LiveNeighbors = 0;
@@ -85,30 +87,31 @@
 		/// <param name="revealedCol"></param>
 		/// <param name="flagCell"></param>
 		/// <returns></returns>
-		public (bool, int, int) UpdateBoard(int revealedRow, int revealedCol, bool flagCell, bool quickSweep)
+		public (bool, bool, int, int) UpdateBoard(int revealedRow, int revealedCol, bool flagCell, bool quickSweep)
 		{
 			int remainingCells = 0, flagCount = 0, bombCount = 0;
+			bool floodFillActivated = false;
 			// Object placeholder variable
-			Cell selectedCell = Grid[revealedRow, revealedCol];
+			CellModel selectedCell = Grid[revealedRow, revealedCol];
 			if (quickSweep && selectedCell.IsRevealed && !flagCell) QuickSweep(revealedRow, revealedCol);
 			// If the cell isn't flagged, flag it (if it isn't revealed) and if it is, unflag it
 			else if (flagCell == true && !selectedCell.IsRevealed) selectedCell.IsFlagged = !selectedCell.IsFlagged;
 			// If the live neighbors is 0, start the recursion process
-			else if (Grid[revealedRow, revealedCol].LiveNeighbors == 0) FloodFill(revealedRow, revealedCol);
+			else if (Grid[revealedRow, revealedCol].LiveNeighbors == 0) { FloodFill(revealedRow, revealedCol); floodFillActivated = true; }
 			// If the cell ins't flagged, reveal it
 			else if (!selectedCell.IsFlagged) selectedCell.IsRevealed = true;
 
 			// Scans each cell to get the count for flags, bombs, and remaining cells
-			foreach (Cell cell in Grid)
+			foreach (CellModel cell in Grid)
 			{
 				if (cell.IsFlagged) flagCount++;
 				if (cell.IsLive) bombCount++;
 				if (!cell.IsRevealed) remainingCells++;
-				if (cell.IsRevealed == true && cell.IsLive == true) return (true, -1, bombCount);
+				if (cell.IsRevealed == true && cell.IsLive == true) return (true, floodFillActivated, - 1, bombCount);
 			}
 			// Returns different things based on the condition of the board
-			if (remainingCells - bombCount == 0) return (true, 0, 0);
-			return (false, remainingCells, bombCount - flagCount);
+			if (remainingCells - bombCount == 0) return (true, floodFillActivated, 0, 0);
+			return (false, floodFillActivated, remainingCells, bombCount - flagCount);
 		}
 		// ------------------------------------------- END OF UPDATE BOARD METHOD ------------------------------------------ //
 
@@ -197,7 +200,7 @@
 		/// <param name="col"></param>
 		public void QuickSweep(int row, int col)
 		{
-			Cell currentCell = Grid[row, col];
+			CellModel currentCell = Grid[row, col];
 
 			for (int r = -1; r <= 1; r++)
 			{

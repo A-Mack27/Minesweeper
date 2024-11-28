@@ -1,26 +1,47 @@
-﻿@model CST_350_Minesweeper_Website.Services.Business.Cell
+﻿@model CST_350_Minesweeper_Website.Models.CellModel;
 
-<!-- Partial view for a single Minesweeper cell -->
-<button id="cell-@Model.RowNumber-@Model.ColumnNumber"
-        class="cell-button"
-        onclick="cellClick(@Model.RowNumber, @Model.ColumnNumber)">
-    @if (Model.IsRevealed)
+@{
+    // Get the board size
+    string boardSize = Context.Session.GetString("CellSize");
+    string buttonColor = "";
+
+    if (Model.IsFlagged)
     {
-        @if (Model.IsLive)
-        {
-            <span>💣</span> <!-- Display bomb -->
-        }
-        else
-        {
-            @Model.LiveNeighbors <!-- Display neighboring bomb count -->
-        }
+        buttonColor = "tomato";
     }
-    else if (Model.IsFlagged)
+    else if ((Model.RowNumber + Model.ColumnNumber) % 2 == 0)
     {
-        <span>🚩</span> <!-- Display flag -->
+        if (Model.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor1");
+        else buttonColor = Context.Session.GetString("UnvisitedColor1");
     }
     else
     {
-        <span>?</span> <!-- Placeholder for unrevealed cells -->
+        if (Model.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor2");
+        else buttonColor = Context.Session.GetString("UnvisitedColor2");
+    }
+}
+
+<style>
+    .cell-class {
+        border: none;
+        padding: 0;
+        margin: 0;
+        width: @boardSize;
+        height: @boardSize;
+    }
+</style>
+
+<!-- Partial view for a single Minesweeper cell. In-line styling to create the grid pattern -->
+<button class="cell-class"
+        id="cell-@Model.RowNumber-@Model.ColumnNumber"
+        style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor");"
+        onclick="handleCellClick(@Model.RowNumber, @Model.ColumnNumber);">
+    @if (Model.IsFlagged)
+    {
+        <img src="~/images/Flag.png" alt="Flagged" />
+    }
+    else if (Model.IsRevealed && Model.LiveNeighbors > 0)
+    {
+        @Model.LiveNeighbors;
     }
 </button>

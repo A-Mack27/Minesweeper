@@ -1,0 +1,30 @@
+﻿@model CST_350_Minesweeper_Website.Services.Business.Board
+
+<!-- Game Board Rendering -->
+<div id="game-board">
+    @for (int i = 0; i < Model.Size; i++)
+    {
+        <div class="row">
+            <!-- Render each cell using the _CellPartial view -->
+            @for (int j = 0; j < Model.Size; j++)
+            {
+                @Html.Partial("_CellPartial", Model.Grid[i, j]);
+            }
+        </div>
+    }
+</div>
+
+<!-- JavaScript for Timer and AJAX Functionality -->
+<script>
+    function handleCellClick(row, col) {
+        $.ajax({
+            url: '@Url.Action("RevealCell", "Game")',
+            type: 'POST',
+            data: { cellLocation: row + ',' + col },
+            success: function (result) {
+                // Update the view with the updated cell
+                $('#cell-' + row + '-' + col).replaceWith(result);
+            }
+        });
+    }
+</script>
