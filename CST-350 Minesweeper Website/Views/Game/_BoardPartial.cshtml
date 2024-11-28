@@ -1,6 +1,6 @@
-﻿@model CST_350_Minesweeper_Website.Services.Business.Board
+﻿@model CST_350_Minesweeper_Website.Models.BoardModel
 
-<!-- Game Board Rendering -->
+<!-- Partial view for the minesweeper board -->
 <div id="game-board">
     @for (int i = 0; i < Model.Size; i++)
     {
@@ -14,16 +14,33 @@
     }
 </div>
 
-<!-- JavaScript for Timer and AJAX Functionality -->
+<!-- JavaScript click handler -->
 <script>
-    function handleCellClick(row, col) {
+
+    function handleCellClick(row, col)
+    {
         $.ajax({
             url: '@Url.Action("RevealCell", "Game")',
             type: 'POST',
             data: { cellLocation: row + ',' + col },
-            success: function (result) {
-                // Update the view with the updated cell
-                $('#cell-' + row + '-' + col).replaceWith(result);
+            success: function (responseHtml)
+            {
+                // Check if the response contains the whole board, the cell, or something else
+                if (responseHtml.includes('id="game-board"'))
+                {
+                    // Replace the board
+                    $('#game-board').replaceWith(responseHtml);
+                }
+                else if (responseHtml.includes('id="cell-' + row + '-' + col + '"'))
+                {
+                    // Update the specific cell if the ID matches
+                    $('#cell-' + row + '-' + col).replaceWith(responseHtml);
+                }
+                else
+                {
+                    window.location.href = responseHtml;
+                }
+
             }
         });
     }

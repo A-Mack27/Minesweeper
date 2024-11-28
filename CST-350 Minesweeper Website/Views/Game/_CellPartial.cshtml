@@ -5,6 +5,7 @@
     string boardSize = Context.Session.GetString("CellSize");
     string buttonColor = "";
 
+    // Determine the color of the button based on the status of the cell
     if (Model.IsFlagged)
     {
         buttonColor = "tomato";
@@ -31,10 +32,10 @@
     }
 </style>
 
-<!-- Partial view for a single Minesweeper cell. In-line styling to create the grid pattern -->
+<!-- Partial view for a single Minesweeper cell. Some in-line styling to create the grid pattern -->
 <button class="cell-class"
-        id="cell-@Model.RowNumber-@Model.ColumnNumber"
-        style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor");"
+        id="cell-@Model.RowNumber-@Model.ColumnNumber"                                          
+        style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor");" 
         onclick="handleCellClick(@Model.RowNumber, @Model.ColumnNumber);">
     @if (Model.IsFlagged)
     {
