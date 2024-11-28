@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using CST_350_Minesweeper_Website.Models;
+using CST_350_Minesweeper_Website.Services.Business;
 
 public class GameController : Controller
 {
+	private static BoardLogic boardLogic = new();
 	private static bool gameStarted;
 	private static bool gameIsOver;
 	private static int cellsLeft;
@@ -172,13 +174,13 @@ public class GameController : Controller
 		// If the game hasn't started...
         if (!gameStarted)
         {
-            board.GenerateBombs(row, col);						  // Generate the bombs
+            boardLogic.GenerateBombs(board, row, col);						  // Generate the bombs
             gameStarted = true;									  // Set the game start to true
             HttpContext.Session.SetString("GameStarted", "true"); // Update the session variable
         }
 
         CellModel cell = board.Grid[row, col];
-        (gameIsOver, multipleCellsUpdated, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
+        (gameIsOver, multipleCellsUpdated, cellsLeft, bombCount) = boardLogic.UpdateBoard(board, row, col, false, false);
         SaveBoard(board);
 
 		// If the game is over...
