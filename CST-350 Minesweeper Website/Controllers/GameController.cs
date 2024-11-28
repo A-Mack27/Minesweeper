@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using CST_350_Minesweeper_Website.Services.Business;
 using CST_350_Minesweeper_Website.Models;
 
 public class GameController : Controller
@@ -83,7 +82,7 @@ public class GameController : Controller
 			case "hard": difficultyInt = 20; break;
 		}
 		// Create the board
-		Board board = new Board(boardSizeInt, difficultyInt);
+		BoardModel board = new BoardModel(boardSizeInt, difficultyInt);
 		gameStarted = false; gameIsOver = false;
 		HttpContext.Session.SetString("GameStarted", "false");
 		HttpContext.Session.SetString("CellSize", cellSize);
@@ -105,13 +104,20 @@ public class GameController : Controller
 		return RedirectToAction("Index", "Theme");
 	}
 	// ---------------------------------------------- END OF RESTART ACTION ------------------------------------------ //
-
+	/// <summary>
+	/// Action to send the user to the configure screen
+	/// </summary>
+	/// <returns></returns>
 	public IActionResult Configure()
 	{
 		return View();
 	}
 
 	// --------------------------------------------------- WIN VIEW -------------------------------------------------- //
+	/// <summary>
+	/// Action to send the user to the win screen
+	/// </summary>
+	/// <returns></returns>
 	public IActionResult Win()
 	{
 		int score = CalculateScore();
@@ -119,16 +125,23 @@ public class GameController : Controller
 		return View(score);
 	}
 	// ------------------------------------------------ END OF WIN VIEW ---------------------------------------------- //
-
+	/// <summary>
+	/// Action to send the user to the loss screen
+	/// </summary>
+	/// <returns></returns>
 	public IActionResult Loss()
 	{
 		return View();
 	}
 
 	// -------------------------------------------- CALCULATE SCORE METHOD ------------------------------------------- //
+	/// <summary>
+	/// Calculate the score of the game
+	/// </summary>
+	/// <returns></returns>
 	private int CalculateScore()
 	{
-		Board board = GetBoard();
+		BoardModel board = GetBoard();
 		TimeSpan elapsedTime = DateTime.Now - DateTime.Parse(HttpContext.Session.GetString("StartTime"));
 		int baseScore = 10000;
 		double sizeMulti = (double)board.Size / 10;
@@ -139,49 +152,65 @@ public class GameController : Controller
 	// ----------------------------------------- END OF CALCULATE SCORE METHOD --------------------------------------- //
 
 	// ---------------------------------------------- REVEAL CELL ACTION --------------------------------------------- //
+	/// <summary>
+	/// Action to reveal a cell of a board, update it, and redirect/return the correct 
+	/// </summary>
+	/// <param name="cellLocation"></param>
+	/// <returns></returns>
 	[HttpPost]
     public IActionResult RevealCell(string cellLocation)
     {
+		// Extract the cell coordinates
         var parts = cellLocation.Split(',');
         int row = Convert.ToInt32(parts[0]);
         int col = Convert.ToInt32(parts[1]);
+		// Create a variable to store if more than one cell was updated
+		bool multipleCellsUpdated;
+		// Get the board from the session variable
+        BoardModel board = GetBoard();
 
-		bool floodFillActivated;
-
-        Board board = GetBoard();
-
+		// If the game hasn't started...
         if (!gameStarted)
         {
-            board.GenerateBombs(row, col);
-            gameStarted = true;
-            HttpContext.Session.SetString("GameStarted", "true");
+            board.GenerateBombs(row, col);						  // Generate the bombs
+            gameStarted = true;									  // Set the game start to true
+            HttpContext.Session.SetString("GameStarted", "true"); // Update the session variable
         }
 
         CellModel cell = board.Grid[row, col];
-        (gameIsOver, floodFillActivated, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
+        (gameIsOver, multipleCellsUpdated, cellsLeft, bombCount) = board.UpdateBoard(row, col, false, false);
         SaveBoard(board);
 
+		// If the game is over...
         if (gameIsOver)
         {
-            HttpContext.Session.SetString("GameStarted", "false");
-            return cellsLeft == 0 ? RedirectToAction("Win") : RedirectToAction("Loss");
+            HttpContext.Session.SetString("GameStarted", "false");				  // Set the game start status to false
+            return cellsLeft == 0 ? Content("/Game/Win") : Content("/Game/Loss"); // Send the user to the win or loss screen
         }
-		if (floodFillActivated) return RedirectToAction("Play", GetBoard());
-        return PartialView("_CellPartial", cell); // Return the updated cell as partial view
+		if (multipleCellsUpdated) return PartialView("_BoardPartial", board);	  // Return the whole board as a partial view
+        return PartialView("_CellPartial", cell);								  // Return the updated cell as partial view
     }
-// -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
+	// -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
 
-// ------------------------------------------------ GET BOARD METHOD ----------------------------------------------- //
-	private Board GetBoard()
+	// ------------------------------------------------ GET BOARD METHOD ----------------------------------------------- //
+	/// <summary>
+	/// Method to get the board from the session
+	/// </summary>
+	/// <returns></returns>
+	private BoardModel GetBoard()
 	{
 		var boardJson = HttpContext.Session.GetString("Board");
 		if (string.IsNullOrEmpty(boardJson)) return null;
-		return JsonConvert.DeserializeObject<Board>(boardJson);
+		return JsonConvert.DeserializeObject<BoardModel>(boardJson);
 	}
 	// --------------------------------------------- END OF GET BOARD METHOD -------------------------------------------- //
 
 	// ------------------------------------------------ SAVE BOARD METHOD ----------------------------------------------- //
-	private void SaveBoard(Board board)
+	/// <summary>
+	/// Method to save the board to the session variable
+	/// </summary>
+	/// <param name="board"></param>
+	private void SaveBoard(BoardModel board)
 	{
 		var boardJson = JsonConvert.SerializeObject(board);
 		HttpContext.Session.SetString("Board", boardJson);
@@ -191,7 +220,7 @@ public class GameController : Controller
 	// --------------------------------------------- UPDATE CELL AJAX HANDLER ------------------------------------------- //
 	public IActionResult UpdateCell(int row, int col)
 	{
-		Board board = GetBoard();
+		BoardModel board = GetBoard();
 		CellModel cell = board.Grid[row, col];
 		cell.IsRevealed = true;
 		SaveBoard(board);

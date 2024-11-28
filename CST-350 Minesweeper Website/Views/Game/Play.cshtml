@@ -1,9 +1,15 @@
-﻿@model CST_350_Minesweeper_Website.Services.Business.Board
+﻿@model BoardModel
+@{
+    string backgroundColor = Context.Session.GetString("FormColor");
+    string textColor = Context.Session.GetString("TextColor");
+}
 
-<h1>Play</h1>
+<h1 style="color: @textColor">
+    Play
+</h1>
 
 <!-- Timer to track player's elapsed time -->
-<div id="timer">00:00</div>
+<div style="color: @textColor" id="timer">00:00</div>
 
 <div>
     @Html.Partial("_BoardPartial", Model);

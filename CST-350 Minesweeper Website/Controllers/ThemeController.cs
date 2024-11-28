@@ -44,7 +44,7 @@ namespace CST_350_Minesweeper_Website.Controllers
 
             // Refresh the page
             if (HttpContext.Session.GetString("GameStarted") == "true")
-                return RedirectToAction("Board", "Game");
+                return RedirectToAction("Play", "Game");
             return RedirectToAction("Configure", "Game");
 		}
 

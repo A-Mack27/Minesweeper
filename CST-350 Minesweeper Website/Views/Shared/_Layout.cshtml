@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <!-- Only apply the body color if the view is the Game Board view -->
-<body style="@((ViewContext.RouteData.Values["controller"].ToString() == "Game" && ViewContext.RouteData.Values["action"].ToString() == "Board") ? $"background-color: {Context.Session.GetString("FormColor")};" : "")">
+<body style="@((ViewContext.RouteData.Values["controller"].ToString() == "Game" && ViewContext.RouteData.Values["action"].ToString() == "Play") ? $"background-color: {Context.Session.GetString("FormColor")};" : "")">
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
