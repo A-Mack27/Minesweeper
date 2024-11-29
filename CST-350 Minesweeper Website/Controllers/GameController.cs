@@ -71,9 +71,9 @@ public class GameController : Controller
 		string cellSize = "";
 		switch (boardSize)
 		{
-			case "small": boardSizeInt = 10; cellSize = "70px"; break;
-			case "medium": boardSizeInt = 15; cellSize = "50px"; break;
-			case "large": boardSizeInt = 20; cellSize = "40px"; break;
+			case "small": boardSizeInt = 10; cellSize = "60px"; break;
+			case "medium": boardSizeInt = 15; cellSize = "45px"; break;
+			case "large": boardSizeInt = 20; cellSize = "35px"; break;
         }
 		// Convert the board difficulty to an int
 		int difficultyInt = 0;
@@ -85,11 +85,11 @@ public class GameController : Controller
 		}
 		// Create the board
 		BoardModel board = new BoardModel(boardSizeInt, difficultyInt);
-		gameStarted = false; gameIsOver = false;
-		HttpContext.Session.SetString("GameStarted", "false");
-		HttpContext.Session.SetString("CellSize", cellSize);
+		gameStarted = false; gameIsOver = false;							 // Set the status of the game
+		HttpContext.Session.SetString("GameStarted", "false");				 // Set the session variable
+		HttpContext.Session.SetString("CellSize", cellSize);				 // Set the session cell size
 		HttpContext.Session.SetString("StartTime", DateTime.Now.ToString()); // Start time for the timer
-		SaveBoard(board);
+		SaveBoard(board, "Board");
 		return RedirectToAction("Play");
 	}
 	// ---------------------------------------------- END OF START ACTION -------------------------------------------- //
@@ -101,67 +101,72 @@ public class GameController : Controller
 	/// <returns></returns>
 	public IActionResult Start()
 	{
+		HttpContext.Session.Remove("GameWon");
 		HttpContext.Session.Remove("Board");
 		HttpContext.Session.SetString("GameStarted", "false");
 		return RedirectToAction("Index", "Theme");
 	}
-	// ---------------------------------------------- END OF RESTART ACTION ------------------------------------------ //
-	/// <summary>
-	/// Action to send the user to the configure screen
-	/// </summary>
-	/// <returns></returns>
-	public IActionResult Configure()
+    // ---------------------------------------------- END OF RESTART ACTION ------------------------------------------ //
+
+    // -------------------------------------------------- CONFIGURE VIEW --------------------------------------------- //
+    /// <summary>
+    /// Action to send the user to the configure screen
+    /// </summary>
+    /// <returns></returns>
+    public IActionResult Configure()
 	{
 		return View();
 	}
+    // --------------------------------------------- END OF CONFIGURE VIEW ------------------------------------------- //
 
-	// --------------------------------------------------- WIN VIEW -------------------------------------------------- //
-	/// <summary>
-	/// Action to send the user to the win screen
-	/// </summary>
-	/// <returns></returns>
-	public IActionResult Win()
+    // --------------------------------------------------- WIN VIEW -------------------------------------------------- //
+    /// <summary>
+    /// Action to send the user to the win screen
+    /// </summary>
+    /// <returns></returns>
+    public IActionResult Win()
 	{
-		int score = CalculateScore();
-		HttpContext.Session.Remove("Board");
-		return View(score);
-	}
-	// ------------------------------------------------ END OF WIN VIEW ---------------------------------------------- //
-	/// <summary>
-	/// Action to send the user to the loss screen
-	/// </summary>
-	/// <returns></returns>
-	public IActionResult Loss()
-	{
-		return View();
-	}
-
-	// -------------------------------------------- CALCULATE SCORE METHOD ------------------------------------------- //
-	/// <summary>
-	/// Calculate the score of the game
-	/// </summary>
-	/// <returns></returns>
-	private int CalculateScore()
-	{
-		BoardModel board = GetBoard();
-#pragma warning disable CS8604 // Possible null reference argument.
+		// Get the time that it took for the user to complete the game
+		#pragma warning disable CS8604 // Possible null reference argument.
         TimeSpan elapsedTime = DateTime.Now - DateTime.Parse(HttpContext.Session.GetString("StartTime"));
-#pragma warning restore CS8604 // Possible null reference argument.
-        int baseScore = 10000;
-		double sizeMulti = (double)board.Size / 10;
-		double diffMulti = (double)board.Difficulty / 10;
-		double score = (baseScore * sizeMulti * diffMulti) / (elapsedTime.TotalSeconds + 1);
-		return (int)score;
+		#pragma warning restore CS8604 // Possible null reference argument.
+		// Get the board
+		BoardModel board = GetBoard();
+		// Set the score
+        board.Score = boardLogic.CalculateScore(elapsedTime, GetBoard());
+        // Cleard the board
+        boardLogic.WipeBoard(board);
+        HttpContext.Session.SetString("GameWon", "true");
+		// Remove the actual board from the session
+		HttpContext.Session.Remove("Board");
+		return View(board);
 	}
-	// ----------------------------------------- END OF CALCULATE SCORE METHOD --------------------------------------- //
+    // ------------------------------------------------ END OF WIN VIEW ---------------------------------------------- //
 
-	// ---------------------------------------------- REVEAL CELL ACTION --------------------------------------------- //
-	/// <summary>
-	/// Action to reveal a cell of a board, update it, and redirect/return the correct 
-	/// </summary>
-	/// <param name="cellLocation"></param>
-	/// <returns></returns>
-	[HttpPost]
+    // --------------------------------------------------- LOSS VIEW ------------------------------------------------- //
+    /// <summary>
+    /// Action to send the user to the loss screen
+    /// </summary>
+    /// <returns></returns>
+    public IActionResult Loss()
+	{
+		// Get and then clear the board
+        BoardModel board = GetBoard();
+		boardLogic.WipeBoard(board);
+		// Flag the game as lost and remove the board from the session
+        HttpContext.Session.SetString("GameWon", "false");
+        HttpContext.Session.Remove("Board");
+        return View(board);
+	}
+    // ----------------------------------------------- END OF LOSS VIEW ---------------------------------------------- //
+
+    // ---------------------------------------------- REVEAL CELL ACTION --------------------------------------------- //
+    /// <summary>
+    /// Action to reveal a cell of a board, update it, and redirect/return the correct 
+    /// </summary>
+    /// <param name="cellLocation"></param>
+    /// <returns></returns>
+    [HttpPost]
     public IActionResult RevealCell(string cellLocation)
     {
 		// Extract the cell coordinates
@@ -183,10 +188,10 @@ public class GameController : Controller
 
         CellModel cell = board.Grid[row, col];
         (gameIsOver, multipleCellsUpdated, cellsLeft, bombCount) = boardLogic.UpdateBoard(board, row, col, false, true);
-        SaveBoard(board);
+		SaveBoard(board, "Board");
 
 		// If the game is over...
-        if (gameIsOver)
+		if (gameIsOver)
         {
             HttpContext.Session.SetString("GameStarted", "false");				  // Set the game start status to false
             return cellsLeft == 0 ? Content("/Game/Win") : Content("/Game/Loss"); // Send the user to the win or loss screen
@@ -216,7 +221,7 @@ public class GameController : Controller
         // Toggle the flag's state
         boardLogic.UpdateBoard(board, row, col, true, false);
         // Save the board
-        SaveBoard(board);
+        SaveBoard(board, "Board");
 		// Return the partial view
 		return PartialView("_CellPartial", cell);
 	}
@@ -240,10 +245,10 @@ public class GameController : Controller
 	/// Method to save the board to the session variable
 	/// </summary>
 	/// <param name="board"></param>
-	private void SaveBoard(BoardModel board)
+	private void SaveBoard(BoardModel board, string sessionVariable)
 	{
 		var boardJson = JsonConvert.SerializeObject(board);
-		HttpContext.Session.SetString("Board", boardJson);
+		HttpContext.Session.SetString(sessionVariable, boardJson);
 	}
 	// --------------------------------------------- END OF SAVE BOARD METHOD ------------------------------------------- //
 

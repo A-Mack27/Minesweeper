@@ -1,10 +1,23 @@
-﻿@{
-    ViewData["Title"] = "Game Over";
-}
+﻿@model CST_350_Minesweeper_Website.Models.BoardModel
 
-<h1>Game Over</h1>
-<p>Better luck next time!</p>
-<br />
-<form method="post">
-    <button class="btn btn-primary" type="submit" asp-controller="Game" asp-action="Index">Try again</button>
-</form>
+<div style="padding-left: 40px">
+    <h2>Oops! You lost :/</h2>
+
+    <!-- Partial view for the minesweeper board -->
+    <div>
+        @for (int i = 0; i < Model.Size; i++)
+        {
+            <div class="row">
+                <!-- Render each cell using the _CellPartial view -->
+                @for (int j = 0; j < Model.Size; j++)
+                {
+                    @Html.Partial("_CellPartial", Model.Grid[i, j]);
+                }
+            </div>
+        }
+    </div>
+    <br />
+    <form method="post">
+        <button class="btn btn-primary" type="submit" asp-controller="Game" asp-action="Index">Play again</button>
+    </form>
+</div>

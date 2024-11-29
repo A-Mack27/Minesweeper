@@ -2,36 +2,41 @@
     ViewData["Title"] = "Start Game";
 }
 
-<h1>Configure Your Game</h1>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Configure Your Game</h1>
 
-<!-- Form to select board size and difficulty level -->
-<form method="post" action="/Game/Initialize">
-    <div>
-        Selected Theme: @Context.Session.GetString("SelectedTheme")
+    <!-- Display the selected theme -->
+    <div class="alert alert-info text-center">
+        Selected Theme: <strong>@Context.Session.GetString("SelectedTheme")</strong>
     </div>
 
-    <div>
-        <label for="boardSize">Select Board Size:</label>
-        <select id="boardSize" name="boardSize" required>
-            <option value="small">Small</option>
-            <option value="medium">Medium</option>
-            <option value="large">Large</option>
-        </select>
-    </div>
+    <!-- Form to select board size and difficulty level -->
+    <form method="post" action="/Game/Initialize" class="card p-4 shadow-lg">
+        <div class="mb-3">
+            <label for="boardSize" class="form-label">Select Board Size:</label>
+            <select id="boardSize" name="boardSize" class="form-select" required>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+            </select>
+        </div>
 
-    <div>
-        <label for="difficulty">Select Difficulty Level:</label>
-        <select id="difficulty" name="difficulty" required>
-            <option value="easy">Easy</option>
-            <option value="medium">Medium</option>
-            <option value="hard">Hard</option>
-        </select>
-    </div>
+        <div class="mb-3">
+            <label for="difficulty" class="form-label">Select Difficulty Level:</label>
+            <select id="difficulty" name="difficulty" class="form-select" required>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
 
-    <div>
-        <button type="submit">Start Game</button>
-    </div>
-</form>
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Start Game</button>
+        </div>
+    </form>
 
-<!-- Additional instructions or information for the user -->
-<p>Choose your desired board size and difficulty level, then click "Start Game" to begin playing Minesweeper! Good luck!</p>
+    <!-- Additional instructions or information for the user -->
+    <p class="text-muted text-center mt-4">
+        Choose your desired board size and difficulty level, then click "Start Game" to begin playing Minesweeper! Good luck!
+    </p>
+</div>

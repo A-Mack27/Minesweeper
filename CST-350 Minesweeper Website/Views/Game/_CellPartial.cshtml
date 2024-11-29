@@ -1,14 +1,21 @@
 ﻿@model CST_350_Minesweeper_Website.Models.CellModel;
 
 @{
-    // Get the board size
+    // Initialize razor variables
     string? boardSize = Context.Session.GetString("CellSize");
+    string? gameWon = Context.Session.GetString("GameWon");
+    string cellClass = "cell-class";
     string? buttonColor = "";
 
-    // Determine the color of the button based on the status of the cell
+    // Determine the color of the button based on the status of the game and the cell's location
     if (Model.IsFlagged)
     {
         buttonColor = "tomato";
+    }
+    else if (Model.IsLive && gameWon != null)
+    {
+        if (gameWon == "true") buttonColor = "lightgreen";
+        else buttonColor = "tomato";
     }
     else if ((Model.RowNumber + Model.ColumnNumber) % 2 == 0)
     {
@@ -20,29 +27,34 @@
         if (Model.IsRevealed) buttonColor = Context.Session.GetString("VisitedColor2");
         else buttonColor = Context.Session.GetString("UnvisitedColor2");
     }
+    // If the game is over, shrink the board and remove its functionality
+    if (gameWon != null)
+    {
+        cellClass = "end-game-cell";
+        boardSize = "35px";
+    }
 }
 
-<style>
-    .cell-class {
-        border: none;
-        padding: 0;
-        margin: 0;
-        width: @boardSize;
-        height: @boardSize;
-    }
-</style>
-
 <!-- Partial view for a single Minesweeper cell. Some in-line styling to create the grid pattern -->
-<button class="cell-class"
+<button class=@cellClass
         id="cell-@Model.RowNumber-@Model.ColumnNumber"                                          
-        style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor");" 
-        onclick="handleCellClick(@Model.RowNumber, @Model.ColumnNumber);">
-    @if (Model.IsFlagged)
+        style="background-color: @buttonColor; color: @Context.Session.GetString("TextColor"); width: @boardSize; height: @boardSize;"
+        onclick="handleCellClick(@Model.RowNumber, @Model.ColumnNumber);"
+>
+    <!-- Display the appropriate image/text based on the game state and user's actions -->
+    @if (Model.IsLive)
     {
-        <img src="~/images/Flag.png" alt="Flagged" />
+        if (Model.IsFlagged || gameWon == "true")
+        {
+            <img src="~/images/Flag.png" alt="Flag" />
+        }
+        else if (gameWon == "false")
+        {
+            <img src="~/images/Bomb.png" alt="Bomb" />
+        }
     }
     else if (Model.IsRevealed && Model.LiveNeighbors > 0)
     {
-        @Model.LiveNeighbors;
+        @Model.LiveNeighbors
     }
 </button>

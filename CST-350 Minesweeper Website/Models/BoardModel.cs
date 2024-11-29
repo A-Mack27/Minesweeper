@@ -8,6 +8,8 @@
         public CellModel[,] Grid { get; set; }
         public decimal Difficulty { get; set; }
         public int InitialBombCount { get; set; }
+        public int FlagCount { get; set; }
+        public int Score {  get; set; }
 
         /// <summary>
         /// Parameterized constructor

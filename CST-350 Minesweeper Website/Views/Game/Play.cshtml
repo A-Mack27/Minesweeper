@@ -2,17 +2,18 @@
 @{
     string backgroundColor = Context.Session.GetString("FormColor");
     string textColor = Context.Session.GetString("TextColor");
+    int bombCount = Model.InitialBombCount - Model.FlagCount;
 }
 
-<h1 style="color: @textColor">
+<h3 style="color: @textColor">
     Play
-</h1>
+</h3>
 
 <!-- Timer to track player's elapsed time -->
 <div style="color: @textColor" id="timer">00:00</div>
 
 <div>
-    @Html.Partial("_BoardPartial", Model);
+    @Html.Partial("_BoardPartial", Model)
 </div>
 
 <!-- JavaScript for Timer and AJAX Functionality -->

@@ -8,7 +8,7 @@
             <!-- Render each cell using the _CellPartial view -->
             @for (int j = 0; j < Model.Size; j++)
             {
-                @Html.Partial("_CellPartial", Model.Grid[i, j]);
+                @Html.Partial("_CellPartial", Model.Grid[i, j])
             }
         </div>
     }

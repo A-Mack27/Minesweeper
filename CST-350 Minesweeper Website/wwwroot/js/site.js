@@ -28,7 +28,7 @@
         console.log("Right-click menu prevented.");
     });
 
-    
+    // Updates a cell/multiple cells to reflect the user's actions
     function updateCell(cellLocation, url)
     {
         // Get the cell coordinates
@@ -39,9 +39,11 @@
             url: url,
             method: "POST",
             data: { cellLocation: cellLocation },
-            success: function (responseHtml) {
+            success: function (responseHtml)
+            {
                 // Depending on the ID of the element...
-                if (responseHtml.includes('id="game-board"')) {
+                if (responseHtml.includes('id="game-board"'))
+                {
                     // Replace the board
                     $('#game-board').replaceWith(responseHtml);
                 }

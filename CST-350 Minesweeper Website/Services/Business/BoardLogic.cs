@@ -63,7 +63,8 @@ namespace CST_350_Minesweeper_Website.Services.Business
         /// <returns></returns>
         public (bool, bool, int, int) UpdateBoard(BoardModel board, int revealedRow, int revealedCol, bool flagCell, bool quickSweep)
         {
-            int remainingCells = 0, flagCount = 0, bombCount = 0;
+            board.FlagCount = 0;
+            int remainingCells = 0, bombCount = 0;
             bool multipleCellsUpdated = false;
             // Object placeholder variable
             CellModel selectedCell = board.Grid[revealedRow, revealedCol];
@@ -78,14 +79,14 @@ namespace CST_350_Minesweeper_Website.Services.Business
             // Scans each cell to get the count for flags, bombs, and remaining cells
             foreach (CellModel cell in board.Grid)
             {
-                if (cell.IsFlagged) flagCount++;
+                if (cell.IsRevealed == true && cell.IsLive == true) return (true, multipleCellsUpdated, -1, bombCount);
+                if (cell.IsFlagged) board.FlagCount++;
                 if (cell.IsLive) bombCount++;
                 if (!cell.IsRevealed) remainingCells++;
-                if (cell.IsRevealed == true && cell.IsLive == true) return (true, multipleCellsUpdated, -1, bombCount);
             }
             // Returns different things based on the condition of the board
             if (remainingCells - bombCount == 0) return (true, multipleCellsUpdated, 0, 0);
-            return (false, multipleCellsUpdated, remainingCells, bombCount - flagCount);
+            return (false, multipleCellsUpdated, remainingCells, bombCount - board.FlagCount);
         }
         // ------------------------------------------- END OF UPDATE BOARD METHOD ------------------------------------------ //
 
@@ -196,5 +197,35 @@ namespace CST_350_Minesweeper_Website.Services.Business
             }
         }
         // -------------------------------------------- END OF QUICKSWEEP METHOD --------------------------------------------- //
+
+        // ---------------------------------------------- CALCULATE SCORE METHOD --------------------------------------------- //
+        /// <summary>
+        /// Calculate the score of the game
+        /// </summary>
+        /// <returns></returns>
+        public int CalculateScore(TimeSpan elapsedTime, BoardModel board)
+        {
+            int baseScore = 10000;
+            double sizeMulti = (double)board.Size / 10;
+            double diffMulti = (double)board.Difficulty / 10;
+            double score = (baseScore * sizeMulti * diffMulti) / (elapsedTime.TotalSeconds + 1);
+            return (int)score;
+        }
+        // ------------------------------------------- END OF CALCULATE SCORE METHOD ----------------------------------------- // 
+
+        // -------------------------------------------------- WIPE BOARD METHOD ---------------------------------------------- //
+        /// <summary>
+        /// Wipe the board by revealling all cells and unflagging flags
+        /// </summary>
+        /// <param name="board"></param>
+        public void WipeBoard(BoardModel board)
+        {
+            foreach (CellModel cell in board.Grid)
+            {
+                if (cell.IsLive) cell.IsFlagged = false;
+                else cell.IsRevealed = true;
+            }
+        }
+        // ----------------------------------------------- END OF WIPE BOARD METHOD ------------------------------------------ //
     }
 }
