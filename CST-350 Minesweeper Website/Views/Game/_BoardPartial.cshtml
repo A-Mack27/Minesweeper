@@ -13,35 +13,3 @@
         </div>
     }
 </div>
-
-<!-- JavaScript click handler -->
-<script>
-
-    function handleCellClick(row, col)
-    {
-        $.ajax({
-            url: '@Url.Action("RevealCell", "Game")',
-            type: 'POST',
-            data: { cellLocation: row + ',' + col },
-            success: function (responseHtml)
-            {
-                // Check if the response contains the whole board, the cell, or something else
-                if (responseHtml.includes('id="game-board"'))
-                {
-                    // Replace the board
-                    $('#game-board').replaceWith(responseHtml);
-                }
-                else if (responseHtml.includes('id="cell-' + row + '-' + col + '"'))
-                {
-                    // Update the specific cell if the ID matches
-                    $('#cell-' + row + '-' + col).replaceWith(responseHtml);
-                }
-                else
-                {
-                    window.location.href = responseHtml;
-                }
-
-            }
-        });
-    }
-</script>

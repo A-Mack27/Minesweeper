@@ -144,8 +144,10 @@ public class GameController : Controller
 	private int CalculateScore()
 	{
 		BoardModel board = GetBoard();
-		TimeSpan elapsedTime = DateTime.Now - DateTime.Parse(HttpContext.Session.GetString("StartTime"));
-		int baseScore = 10000;
+#pragma warning disable CS8604 // Possible null reference argument.
+        TimeSpan elapsedTime = DateTime.Now - DateTime.Parse(HttpContext.Session.GetString("StartTime"));
+#pragma warning restore CS8604 // Possible null reference argument.
+        int baseScore = 10000;
 		double sizeMulti = (double)board.Size / 10;
 		double diffMulti = (double)board.Difficulty / 10;
 		double score = (baseScore * sizeMulti * diffMulti) / (elapsedTime.TotalSeconds + 1);
@@ -174,13 +176,13 @@ public class GameController : Controller
 		// If the game hasn't started...
         if (!gameStarted)
         {
-            boardLogic.GenerateBombs(board, row, col);						  // Generate the bombs
+            boardLogic.GenerateBombs(board, row, col);			  // Generate the bombs
             gameStarted = true;									  // Set the game start to true
             HttpContext.Session.SetString("GameStarted", "true"); // Update the session variable
         }
 
         CellModel cell = board.Grid[row, col];
-        (gameIsOver, multipleCellsUpdated, cellsLeft, bombCount) = boardLogic.UpdateBoard(board, row, col, false, false);
+        (gameIsOver, multipleCellsUpdated, cellsLeft, bombCount) = boardLogic.UpdateBoard(board, row, col, false, true);
         SaveBoard(board);
 
 		// If the game is over...
@@ -193,6 +195,32 @@ public class GameController : Controller
         return PartialView("_CellPartial", cell);								  // Return the updated cell as partial view
     }
 	// -------------------------------------------- END OF REVEAL CELL ACTION ------------------------------------------ //
+
+	// ------------------------------------------------- FLAG CELL ACTION ---------------------------------------------- //
+	/// <summary>
+	/// Action to flag a cell
+	/// </summary>
+	/// <param name="cellLocation"></param>
+	/// <returns></returns>
+	public IActionResult FlagCell(string cellLocation)
+	{
+        // Extract the cell coordinates
+        var parts = cellLocation.Split(',');
+        int row = Convert.ToInt32(parts[0]);
+        int col = Convert.ToInt32(parts[1]);
+
+		// Get the board from the session and get the cell that was clicked
+        BoardModel board = GetBoard();
+		CellModel cell = board.Grid[row, col];
+
+        // Toggle the flag's state
+        boardLogic.UpdateBoard(board, row, col, true, false);
+        // Save the board
+        SaveBoard(board);
+		// Return the partial view
+		return PartialView("_CellPartial", cell);
+	}
+    // -------------------------------------------- END OF FLAG CELL ACTION -------------------------------------------- //
 
 	// ------------------------------------------------ GET BOARD METHOD ----------------------------------------------- //
 	/// <summary>
@@ -219,14 +247,4 @@ public class GameController : Controller
 	}
 	// --------------------------------------------- END OF SAVE BOARD METHOD ------------------------------------------- //
 
-	// --------------------------------------------- UPDATE CELL AJAX HANDLER ------------------------------------------- //
-	public IActionResult UpdateCell(int row, int col)
-	{
-		BoardModel board = GetBoard();
-		CellModel cell = board.Grid[row, col];
-		cell.IsRevealed = true;
-		SaveBoard(board);
-		return PartialView("_CellPartial", cell);
-	}
-	// -------------------------------------------- END OF UPDATE CELL AJAX HANDLER ------------------------------------ //
 }

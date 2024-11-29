@@ -2,8 +2,8 @@
 
 @{
     // Get the board size
-    string boardSize = Context.Session.GetString("CellSize");
-    string buttonColor = "";
+    string? boardSize = Context.Session.GetString("CellSize");
+    string? buttonColor = "";
 
     // Determine the color of the button based on the status of the cell
     if (Model.IsFlagged)

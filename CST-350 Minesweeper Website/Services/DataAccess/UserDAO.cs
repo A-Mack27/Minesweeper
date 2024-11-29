@@ -2,6 +2,7 @@
 using CST_350_Minesweeper_Website.Models;
 using System.Data.SqlClient;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 namespace CST_350_Minesweeper_Website.Services.DataAccess
 {
     public class UserDAO : IUserManager
@@ -184,3 +185,4 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
         }
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

@@ -67,7 +67,7 @@ namespace CST_350_Minesweeper_Website.Services.Business
             bool multipleCellsUpdated = false;
             // Object placeholder variable
             CellModel selectedCell = board.Grid[revealedRow, revealedCol];
-            if (quickSweep && selectedCell.IsRevealed && !flagCell) QuickSweep(board, revealedRow, revealedCol);
+            if (quickSweep && selectedCell.IsRevealed && !flagCell) { QuickSweep(board, revealedRow, revealedCol); multipleCellsUpdated = true; }
             // If the cell isn't flagged, flag it (if it isn't revealed) and if it is, unflag it
             else if (flagCell == true && !selectedCell.IsRevealed) selectedCell.IsFlagged = !selectedCell.IsFlagged;
             // If the live neighbors is 0, start the recursion process
