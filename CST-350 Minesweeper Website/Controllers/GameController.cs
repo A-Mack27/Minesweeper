@@ -48,10 +48,6 @@ public class GameController : Controller
 	/// <returns></returns>
 	public IActionResult Resume()
 	{
-		if (HttpContext.Session.GetString("Board") != null)
-		{
-			return RedirectToAction("Index", "Theme");
-		}
 		return RedirectToAction("Play", "Game");
 	}
 	// --------------------------------------------- END OF RESUME ACTION -------------------------------------------- //

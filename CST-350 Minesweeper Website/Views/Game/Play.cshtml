@@ -17,11 +17,14 @@
 </div>
 
 <!-- JavaScript for Timer and AJAX Functionality -->
+@* Maybe use set interval to update bomb count at a set interval? *@
 <script>
+    // Pass the DateTime session variable into the start time which prevents the clock from resetting
+    let startTime = new Date('@Context.Session.GetString("StartTime")');
+
     // Timer functionality to display elapsed time
-    let startTime = Date.now();
     setInterval(function () {
-        let elapsedTime = Date.now() - startTime;
+        let elapsedTime = Date.now() - startTime.getTime();
         let minutes = Math.floor(elapsedTime / 60000);
         let seconds = Math.floor((elapsedTime % 60000) / 1000);
         document.getElementById('timer').innerText =
