@@ -53,7 +53,7 @@ public class GameController : Controller
 	}
     // --------------------------------------------- END OF RESUME ACTION -------------------------------------------- //
 
-    // ------------------------------------------------- START ACTION ------------------------------------------------ //
+    // ----------------------------------------------- INITIALIZE ACTION --------------------------------------------- //
     /// <summary>
     /// Action to start the game
     /// </summary>
@@ -103,16 +103,16 @@ public class GameController : Controller
         }
 
         HttpContext.Session.Remove("GameWon");
-        gameStarted = resumingSavedGame ? true : false; gameIsOver = false;											// Set the status of the game
-		HttpContext.Session.SetString("GameStarted", resumingSavedGame? "true" : "false"); // Set the session start variable
+        gameStarted = resumingSavedGame ? true : false; gameIsOver = false;					// Set the status of the game
+		HttpContext.Session.SetString("GameStarted", resumingSavedGame? "true" : "false");  // Set the session start variable
 		HttpContext.Session.SetString("CellSize", cellSize);                                // Set the session cell size
 		HttpContext.Session.SetString("StartTime", DateTime.Now.ToString());                // Start time for the timer
 
 		return RedirectToAction("Play");
 	}
-	// ---------------------------------------------- END OF START ACTION -------------------------------------------- //
+	// ------------------------------------------- END OF INITIALIZE ACTION ------------------------------------------ //
 
-	// ------------------------------------------------- RESTART ACTION ---------------------------------------------- //
+	// -------------------------------------------------- START ACTION ----------------------------------------------- //
 	/// <summary>
 	/// Action to restart the game and remove the board
 	/// </summary>
@@ -124,7 +124,7 @@ public class GameController : Controller
 		HttpContext.Session.SetString("GameStarted", "false");
 		return RedirectToAction("Index", "Theme");
 	}
-	// ---------------------------------------------- END OF RESTART ACTION ------------------------------------------ //
+	// ----------------------------------------------- END OF START ACTION ------------------------------------------- //
 
 	// -------------------------------------------------- CONFIGURE VIEW --------------------------------------------- //
 	/// <summary>
