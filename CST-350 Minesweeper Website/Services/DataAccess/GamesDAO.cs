@@ -11,10 +11,10 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
         static string conn = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=UserProfile;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
         /// <summary>
-        /// Adds a new saved game.
+        /// Adds a new saved game
         /// </summary>
         /// <param name="game"></param>
-        /// <returns>The ID of the newly saved game.</returns>
+        /// <returns></returns>
         public int AddGame(SavedGameModel game)
         {
             using (SqlConnection connection = new SqlConnection(conn))
@@ -37,10 +37,10 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
         }
 
         /// <summary>
-        /// Retrieves all saved games of a specific user from the database.
+        /// Retrieves all saved games of a specific user from the database
         /// </summary>
-        /// <param name="userId">The ID of the user whose games are to be retrieved.</param>
-        /// <returns>A list of saved games for the specified user.</returns>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public List<SavedGameModel> GetAllGames(int userId)
         {
             List<SavedGameModel> games = new List<SavedGameModel>();
@@ -73,10 +73,10 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
         }
 
         /// <summary>
-        /// Retrieves a saved game by its ID.
+        /// Retrieves a saved game by its ID
         /// </summary>
         /// <param name="id"></param>
-        /// <returns>The saved game if found, or null if not found.</returns>
+        /// <returns></returns>
         public SavedGameModel GetGameById(int id)
         {
             using (SqlConnection connection = new SqlConnection(conn))
@@ -107,7 +107,7 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
         }
 
         /// <summary>
-        /// Updates an existing saved game.
+        /// Updates an existing saved game
         /// </summary>
         /// <param name="game"></param>
         public void UpdateGame(SavedGameModel game)
@@ -131,7 +131,7 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
         }
 
         /// <summary>
-        /// Deletes a saved game by its ID.
+        /// Deletes a saved game by its ID
         /// </summary>
         /// <param name="id"></param>
         public void DeleteGame(int id)

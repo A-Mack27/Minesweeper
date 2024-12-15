@@ -101,11 +101,12 @@ public class GameController : Controller
             case 15: cellSize = "45px"; break;
             case 20: cellSize = "35px"; break;
         }
-		
-		gameStarted = false; gameIsOver = false;                             // Set the status of the game
-		HttpContext.Session.SetString("GameStarted", "false");               // Set the session variable
-		HttpContext.Session.SetString("CellSize", cellSize);                 // Set the session cell size
-		HttpContext.Session.SetString("StartTime", DateTime.Now.ToString()); // Start time for the timer
+
+        HttpContext.Session.Remove("GameWon");
+        gameStarted = resumingSavedGame ? true : false; gameIsOver = false;											// Set the status of the game
+		HttpContext.Session.SetString("GameStarted", resumingSavedGame? "true" : "false"); // Set the session start variable
+		HttpContext.Session.SetString("CellSize", cellSize);                                // Set the session cell size
+		HttpContext.Session.SetString("StartTime", DateTime.Now.ToString());                // Start time for the timer
 
 		return RedirectToAction("Play");
 	}
