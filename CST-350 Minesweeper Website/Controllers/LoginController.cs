@@ -20,6 +20,14 @@ namespace CST_350_Minesweeper_Website.Controllers
         {
             // Remove all session variables and return them to the home page
             HttpContext.Session.Clear();
+
+            HttpContext.Session.SetString("FormColor", "rgb(255, 255, 255)");  // Default background color
+            HttpContext.Session.SetString("VisitedColor1", "rgb(219, 219, 219)");  // Default visited color 1
+            HttpContext.Session.SetString("VisitedColor2", "rgb(200, 200, 200)");  // Default visited color 2
+            HttpContext.Session.SetString("UnvisitedColor1", "rgb(131, 131, 131)");  // Default unvisited color 1
+            HttpContext.Session.SetString("UnvisitedColor2", "rgb(115, 115, 115)");  // Default unvisited color 2
+            HttpContext.Session.SetString("TextColor", "rgb(10, 10, 10)");  // Default text color
+
             return View("Index");
         }
 
