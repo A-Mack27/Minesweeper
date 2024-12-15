@@ -107,30 +107,6 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
         }
 
         /// <summary>
-        /// Updates an existing saved game
-        /// </summary>
-        /// <param name="game"></param>
-        public void UpdateGame(SavedGameModel game)
-        {
-            using (SqlConnection connection = new SqlConnection(conn))
-            {
-                connection.Open();
-                string query = "UPDATE dbo.Games SET UserId = @UserId, DateSaved = @DateSaved, SaveState = @SaveState " +
-                               "WHERE Id = @Id;";
-
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Id", game.Id);
-                    command.Parameters.AddWithValue("@UserId", game.UserId);
-                    command.Parameters.AddWithValue("@DateSaved", game.DateSaved);
-                    command.Parameters.AddWithValue("@SaveState", game.SaveState);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-
-        /// <summary>
         /// Deletes a saved game by its ID
         /// </summary>
         /// <param name="id"></param>
