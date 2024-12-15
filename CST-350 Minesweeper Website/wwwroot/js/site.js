@@ -60,4 +60,18 @@
             }
         });
     }
+
+    // Handle Save Game button click
+    $('#saveGameButton').click(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            url: '/SavedGame/SaveBoardToDatabase',
+            type: 'POST',
+            success: function (response) {
+                // Handle the response, e.g., show a success message or update the UI
+                alert('Game Saved');
+            }
+        });
+    });
 });

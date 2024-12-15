@@ -5,15 +5,30 @@
     int bombCount = Model.InitialBombCount - Model.FlagCount;
 }
 
-<h3 style="color: @textColor">
-    Play
-</h3>
-
-<!-- Timer to track player's elapsed time -->
-<div style="color: @textColor" id="timer">00:00</div>
 
 <div>
-    @Html.Partial("_BoardPartial", Model)
+    <h3 style="color: @textColor">
+        Play
+    </h3>
+
+    <!-- Timer to track player's elapsed time -->
+    <div 
+        style="color: @textColor" id="timer">00:00
+    </div>
+
+    <div>
+        @Html.Partial("_BoardPartial", Model)
+    </div>
+    <br />
+    <div>
+        <button class="btn btn-primary btm-sm" 
+                id="saveGameButton" 
+                style="font-size: 14px; color: @textColor; 
+                       background-color: @backgroundColor; 
+                       border-color: @textColor;">
+            Save to Cloud
+        </button>
+    </div>
 </div>
 
 <!-- JavaScript for Timer and AJAX Functionality -->
@@ -30,4 +45,6 @@
         document.getElementById('timer').innerText =
             `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }, 1000);
+
+    
 </script>
