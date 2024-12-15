@@ -1,14 +1,15 @@
 ﻿<h1>Please choose to either start a new game or resume your current game</h1>
 
 <form method="post">
+    <h3>!! WARNING - this will override your current game if you're already playing !!</h3>
+    <br />
     <div>
         <h3>Resume playing</h3>
-        <button class="btn btn-primary" type="submit" asp-controller="Game" asp-action="Resume">Resume</button>
+        <button class="btn btn-primary" type="submit" asp-controller="Game" asp-action="ResumeSaved">Resume</button>
     </div>
     <br />
     <div>
         <h3>Start a new game</h3>
-        <p>!! Warning, this will override your current game if you're already playing !!</p>
         <button class="btn btn-primary" type="submit" asp-controller="Game" asp-action="Start">Start New</button>
     </div>
 </form>

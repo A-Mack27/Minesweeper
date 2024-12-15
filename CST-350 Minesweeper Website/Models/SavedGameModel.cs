@@ -6,7 +6,5 @@
         public int UserId { get; set; }
         public DateTime DateSaved { get; set; }
         public string SaveState { get; set; }
-
-        
     }
 }

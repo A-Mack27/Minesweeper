@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using CST_350_Minesweeper_Website.Models;
 using CST_350_Minesweeper_Website.Services.Business;
+using System.Linq.Expressions;
 
 public class GameController : Controller
 {
@@ -37,7 +38,7 @@ public class GameController : Controller
 	public IActionResult Play()
 	{
 		// Retrieve the board and pass it to the Board view
-		return View("Play", GetBoard());
+		return View(GetBoard());
 	}
 	// ---------------------------------------------- END OF BOARD VIEW ---------------------------------------------- //
 
@@ -46,46 +47,66 @@ public class GameController : Controller
 	/// Action to handle the resume button
 	/// </summary>
 	/// <returns></returns>
-	public IActionResult Resume()
+	public IActionResult ResumeSaved()
 	{
-		return RedirectToAction("Play", "Game");
+		return RedirectToAction("Index", "SavedGame");
 	}
-	// --------------------------------------------- END OF RESUME ACTION -------------------------------------------- //
+    // --------------------------------------------- END OF RESUME ACTION -------------------------------------------- //
 
-	// ------------------------------------------------- START ACTION ------------------------------------------------ //
-	/// <summary>
-	/// Action to start the game
-	/// </summary>
-	/// <param name="boardSize"></param>
-	/// <param name="difficulty"></param>
-	/// <returns></returns>
-	[HttpPost]
-	public IActionResult Initialize(string boardSize, string difficulty)
+    // ------------------------------------------------- START ACTION ------------------------------------------------ //
+    /// <summary>
+    /// Action to start the game
+    /// </summary>
+    /// <param name="boardSize"></param>
+    /// <param name="difficulty"></param>
+    /// <param name="resumingSaved"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [HttpGet]
+    public IActionResult Initialize(string boardSize, string difficulty, bool resumingSavedGame = false)
 	{
-		// Convert the board size string to an int
-		int boardSizeInt = 0;
+		// Convert the board size string to an int or set it to 0 for a new board
+		int boardSizeInt = !resumingSavedGame? 0 : Int32.Parse(boardSize);
 		string cellSize = "";
-		switch (boardSize)
+
+		// If a new game is being started, all these numbers need to be run
+		if (!resumingSavedGame)
 		{
-			case "small": boardSizeInt = 10; cellSize = "60px"; break;
-			case "medium": boardSizeInt = 15; cellSize = "45px"; break;
-			case "large": boardSizeInt = 20; cellSize = "35px"; break;
-		}
-		// Convert the board difficulty to an int
-		int difficultyInt = 0;
-		switch (difficulty)
+			// Get the board size
+            switch (boardSize)
+            {
+                case "small": boardSizeInt = 10; break;
+                case "medium": boardSizeInt = 15; break;
+                case "large": boardSizeInt = 20; break;
+            }
+
+            // Convert the board difficulty to an int
+            int difficultyInt = 0;
+            switch (difficulty)
+            {
+                case "easy": difficultyInt = 10; break;
+                case "medium": difficultyInt = 15; break;
+                case "hard": difficultyInt = 20; break;
+            }
+
+			// Create and save the new board
+            BoardModel board = new BoardModel(boardSizeInt, difficultyInt);
+            SaveSessionBoard(board, "Board");
+        }
+        
+		// This is left out because the cell size needs to be determined regardless of if it's a new game or not
+        switch (boardSizeInt)
 		{
-			case "easy": difficultyInt = 10; break;
-			case "medium": difficultyInt = 15; break;
-			case "hard": difficultyInt = 20; break;
-		}
-		// Create the board
-		BoardModel board = new BoardModel(boardSizeInt, difficultyInt);
+			case 10: cellSize = "60px"; break;
+            case 15: cellSize = "45px"; break;
+            case 20: cellSize = "35px"; break;
+        }
+		
 		gameStarted = false; gameIsOver = false;                             // Set the status of the game
 		HttpContext.Session.SetString("GameStarted", "false");               // Set the session variable
 		HttpContext.Session.SetString("CellSize", cellSize);                 // Set the session cell size
 		HttpContext.Session.SetString("StartTime", DateTime.Now.ToString()); // Start time for the timer
-		SaveSessionBoard(board, "Board");
+
 		return RedirectToAction("Play");
 	}
 	// ---------------------------------------------- END OF START ACTION -------------------------------------------- //

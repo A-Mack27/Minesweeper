@@ -1,10 +1,37 @@
 ﻿@model List<CST_350_Minesweeper_Website.Models.SavedGameModel>
 
-<div>
-    <h4>Saved Games</h4>
-    <hr />
-    @foreach (SavedGameModel savedGame in Model)
-    {
-        
-    }
-</div>
+<h4>Saved Games</h4>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date Saved</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var savedGame in Model)
+        {
+            <tr>
+                <td style="font-weight: bold;">
+                    Save #@savedGame.Id
+                </td>
+                <td>
+                    @savedGame.DateSaved.ToString("dd/MM/yyyy HH:mm")
+                </td>
+                <td>
+                    <div style="display: flex; gap: 10px;">
+                        <form asp-controller="SavedGame" asp-action="ResumeSavedGame" method="post" style="margin: 0;">
+                            <input type="hidden" name="id" value="@savedGame.Id" />
+                            <button class="btn btn-primary" type="submit">Resume</button>
+                        </form>
+                        <form asp-controller="SavedGame" asp-action="DeleteSavedGame" method="post" style="margin: 0;">
+                            <input type="hidden" name="id" value="@savedGame.Id" />
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
