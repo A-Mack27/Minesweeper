@@ -162,6 +162,16 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
             // Return the list
             return users;
         }
+
+        public UserModel GetUserById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateUser(UserModel user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 #pragma warning restore CS0618 // Type or member is obsolete
