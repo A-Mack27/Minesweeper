@@ -58,12 +58,12 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                     {
                         while (reader.Read())
                         {
-                            SavedGameModel game = new SavedGameModel(
-                                reader.GetInt32(reader.GetOrdinal("Id")),
-                                reader.GetInt32(reader.GetOrdinal("UserId")),
-                                reader.GetDateTime(reader.GetOrdinal("DateSaved")),
-                                reader.GetString(reader.GetOrdinal("SaveState"))
-                            );
+                            SavedGameModel game = new();
+                            game.Id = reader.GetInt32(reader.GetOrdinal("Id"));
+                            game.UserId = reader.GetInt32(reader.GetOrdinal("UserId"));
+                            game.DateSaved = reader.GetDateTime(reader.GetOrdinal("DateSaved"));
+                            game.SaveState = reader.GetString(reader.GetOrdinal("SaveState"));
+                            
                             games.Add(game);
                         }
                     }
@@ -92,12 +92,13 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
                     {
                         if (reader.Read())
                         {
-                            return new SavedGameModel(
-                                reader.GetInt32(reader.GetOrdinal("Id")),
-                                reader.GetInt32(reader.GetOrdinal("UserId")),
-                                reader.GetDateTime(reader.GetOrdinal("DateSaved")),
-                                reader.GetString(reader.GetOrdinal("SaveState"))
-                            );
+                            SavedGameModel game = new();
+                            game.Id = reader.GetInt32(reader.GetOrdinal("Id"));
+                            game.UserId = reader.GetInt32(reader.GetOrdinal("UserId"));
+                            game.DateSaved = reader.GetDateTime(reader.GetOrdinal("DateSaved"));
+                            game.SaveState = reader.GetString(reader.GetOrdinal("SaveState"));
+
+                            return game;
                         }
                     }
                 }

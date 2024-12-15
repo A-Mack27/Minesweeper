@@ -17,8 +17,18 @@ namespace CST_350_Minesweeper_Website.Controllers
         [HttpPost]
         public IActionResult SaveBoardToDatabase()
         {
-            // Save the game to the database logic
-            return Json(new { success = true });  // Send success message as JSON
+            UserModel user = JsonConvert.DeserializeObject<UserModel>(HttpContext.Session.GetString("User"));
+            GamesDAO gamesDAO = new();
+
+            SavedGameModel savedGame = new();
+            savedGame.UserId = user.Id;
+            savedGame.DateSaved = DateTime.Now;
+            savedGame.SaveState = HttpContext.Session.GetString("Board");
+
+            gamesDAO.AddGame(savedGame);
+
+            // Send success message as JSON
+            return Json(new { success = true });  
         }
 
         public void GetUserGames()

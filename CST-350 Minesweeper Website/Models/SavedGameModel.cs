@@ -7,12 +7,6 @@
         public DateTime DateSaved { get; set; }
         public string SaveState { get; set; }
 
-        public SavedGameModel(int id, int userId, DateTime dateSaved, string saveState)
-        {
-            Id = id;
-            UserId = userId;
-            DateSaved = dateSaved;
-            SaveState = saveState;
-        }
+        
     }
 }
