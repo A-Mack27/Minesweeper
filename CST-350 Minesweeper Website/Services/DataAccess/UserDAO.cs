@@ -162,27 +162,6 @@ namespace CST_350_Minesweeper_Website.Services.DataAccess
             // Return the list
             return users;
         }
-
-        /// <summary>
-        /// Searches for a user based on the inputted ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns>The user found</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public UserModel GetUserById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Updates the information of a desired user
-        /// </summary>
-        /// <param name="user"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void UpdateUser(UserModel user)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
 #pragma warning restore CS0618 // Type or member is obsolete
