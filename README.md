@@ -1,3 +1,10 @@
+Important Note: BJ removed from this project following Milestone 3 due to...
+- Lack of contribution (Wrote at most 7% of the code, usually breaking it and then having me fix it)
+- Lack of understanding (Doesn't understand concepts from the prerequisite class)
+- Lack of communication (Fails to respond timely)
+- Lack of originality (Plagarized)
+
+
 Here's how to add the database to your MSSQLLocalDB
 
 Right click the databases file and press 'Publish Data-tier Application'
